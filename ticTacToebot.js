@@ -1,5 +1,80 @@
-const gameboard = [topLeft, topCenter, topRight, midLeft midCenter, 
-    midRight, bottomLeft, bottomCenter, bottomRight]
+// const Square = (name, row, column, position, diagonal) => {
+//     let marker = null;
+//     const getName = () => name;
+//     const getRow = () => row;
+//     const getColumn = () => column;
+//     const getPosition = () => position;
+//     const getDiagonal = () => diagonal;
+//     const getMarker = () => marker;
+//     const mark = symbol => {
+//         marker = symbol;
+//     };
+//     return {getName, getRow, getColumn, getPosition, getDiagonal, getMarker, mark}
+// }
+
+const nameGetter = state => ({
+    getName: () => state.name
+});
+
+const markGetter = state => ({
+    getMark: () => state.mark
+});
+
+const markSetter = state => ({
+    setMark: (symbol) => {
+        if (state.mark === null) {
+            state.mark = symbol;
+        }
+    }
+});
+
+const Square = name => {
+    let state = {
+        name,
+        mark: null
+    }
+    return Object.assign({}, nameGetter(state), markGetter(state), markSetter(state))
+};
+
+// const topLeft = Square('topLeft');
+// const topCenter = Square('topCenter');
+// const topRight = Square('topRight');
+// const midLeft = Square('midLeft');
+// const midCenter = Square('midCenter');
+// const midRight = Square('midRight');
+// const bottomLeft = Square('bottomLeft');
+// const bottomCenter = Square('bottomCenter');
+// const bottomRight = Square('bottomRight');
+
+const WinSet = (name, ...squares) => {
+    const topRow = squares;
+};
+
+const gameboard = (() => {
+    const topLeft = Square('topLeft');
+    const topCenter = Square('topCenter');
+    const topRight = Square('topRight');
+    const midLeft = Square('midLeft');
+    const midCenter = Square('midCenter');
+    const midRight = Square('midRight');
+    const bottomLeft = Square('bottomLeft');
+    const bottomCenter = Square('bottomCenter');
+    const bottomRight = Square('bottomRight');
+
+    const array = [topLeft, topCenter, topRight, midLeft, midCenter, 
+        midRight, bottomLeft, bottomCenter, bottomRight];
+    // const topRow = [topLeft, topCenter, topRight];
+    // const midRow = [midLeft, midCenter, midRight];
+    // const bottomRow = [bottomLeft, bottomCenter, bottomRight];
+    // const leftColumn = [topLeft, midLeft, bottomLeft];
+    // const centerColumn = [topCenter, midCenter, bottomCenter];
+    // const rightColumn = [topRight, midRight, bottomRight];
+    const getArray = () => array;
+    const getName = () => 'gameboard';
+    return {getArray, getName};
+})();
+
+
 
 // Grid:
 //  TL TC TR   X    Y   C S C

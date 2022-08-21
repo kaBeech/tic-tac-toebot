@@ -48,17 +48,43 @@ const gameboard = (() => {
     return Object.assign ({}, arrayGetter(state), nameGetter(state));
 })();
 
+const winChecker = state => ({
+    checkWin: () => {
+        let xMarks = 0;
+        let oMarks = 0;
+        for (square in state.array) {
+            if (square.mark === 'X') {
+                xMarks += 1
+            } else if (square.mark === 'O') {
+                oMarks += 1
+            };
+        };
+        if (xMarks === 3) {
+            // X WIN
+        } else if (oMarks ===3) {
+            // O WIN
+        };
+    };
+});
+
+const Winset = set => {
+    const state = {
+        array: set
+    }
+    return Object.assign({}, arrayGetter(state), winChecker(state))
+};
+
 const winSets = (() => {
     const allSquares = gameboard.getArray();
 
-    const topRow = allSquares.slice(0, 3);
-    const midRow = allSquares.slice(3, 6);
-    const bottomRow = allSquares.slice(6,);;
-    const leftColumn = [topRow[0], midRow[0], bottomRow[0]];
-    const centerColumn = [topRow[1], midRow[1], bottomRow[1]];
-    const rightColumn = [topRow[2], midRow[2], bottomRow[2]];
-    const diagonalX = [topRow[0], midRow[1], bottomRow[2]];
-    const diagonalY = [topRow[2], midRow[1], bottomRow[0]];
+    const topRow = Winset(allSquares.slice(0, 3));
+    const midRow = Winset(allSquares.slice(3, 6));
+    const bottomRow = Winset(allSquares.slice(6,));
+    const leftColumn = Winset([topRow[0], midRow[0], bottomRow[0]]);
+    const centerColumn = Winset([topRow[1], midRow[1], bottomRow[1]]);
+    const rightColumn = Winset([topRow[2], midRow[2], bottomRow[2]]);
+    const diagonalX = Winset([topRow[0], midRow[1], bottomRow[2]]);
+    const diagonalY = Winset([topRow[2], midRow[1], bottomRow[0]]);
 
     const rowsAndColumns = [topRow, midRow, bottomRow, leftColumn, 
         centerColumn, rightColumn];

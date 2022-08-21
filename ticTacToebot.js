@@ -5,7 +5,7 @@
 //  ML MC MR
 //  BL BC BR
 
-// AI:  
+// UNBEATABLE AI:  
 // if (any row or column contains two AI marks and zero human marks) {
 //     mark the third cell in that row or column
 // }
@@ -37,4 +37,12 @@
 //
 // if (any corners are available) {
 //     mark a random corner
+// }
+//
+// if (any sides are available) {
+//     mark a random side
+// }
+//
+// else {
+//     mark a random square
 // }

@@ -21,7 +21,7 @@ const arrayGetter = state => ({
 })
 
 const Square = name => {
-    let state = {
+    const state = {
         name,
         mark: null
     }
@@ -39,23 +39,37 @@ const gameboard = (() => {
     const bottomCenter = Square('bottomCenter');
     const bottomRight = Square('bottomRight');
 
-    let state = {
+    const state = {
         name: 'gameboard',
         array: [topLeft, topCenter, topRight, midLeft, midCenter, 
         midRight, bottomLeft, bottomCenter, bottomRight]
     }
-    // const topRow = [topLeft, topCenter, topRight];
-    // const midRow = [midLeft, midCenter, midRight];
-    // const bottomRow = [bottomLeft, bottomCenter, bottomRight];
-    // const leftColumn = [topLeft, midLeft, bottomLeft];
-    // const centerColumn = [topCenter, midCenter, bottomCenter];
-    // const rightColumn = [topRight, midRight, bottomRight];
+
     return Object.assign ({}, arrayGetter(state), nameGetter(state));
 })();
 
-// const winSets = (() => {
-//     const allSquares = gameboard.getArray()
-// })
+const winSets = (() => {
+    const allSquares = gameboard.getArray();
+
+    const topRow = allSquares.slice(0, 3);
+    const midRow = allSquares.slice(3, 6);
+    const bottomRow = allSquares.slice(6,);;
+    const leftColumn = [topRow[0], midRow[0], bottomRow[0]];
+    const centerColumn = [topRow[1], midRow[1], bottomRow[1]];
+    const rightColumn = [topRow[2], midRow[2], bottomRow[2]];
+    const diagonalX = [topRow[0], midRow[1], bottomRow[2]];
+    const diagonalY = [topRow[2], midRow[1], bottomRow[0]];
+
+    const rowsAndColumns = [topRow, midRow, bottomRow, leftColumn, 
+        centerColumn, rightColumn];
+    const diagonals = [diagonalX, diagonalY];
+
+    const state = {
+        array: [rowsAndColumns, diagonals]
+    }
+
+    return Object.assign ({}, arrayGetter(state));
+})();
 
 
 // Grid:

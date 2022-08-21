@@ -1,11 +1,12 @@
-
+const gameboard = [topLeft, topCenter, topRight, midLeft midCenter, 
+    midRight, bottomLeft, bottomCenter, bottomRight]
 
 // Grid:
 //  TL TC TR   X    Y   C S C
 //  ML MC MR     XY     S I S
 //  BL BC BR   Y    X   C S C
 
-// UNBEATABLE AI:  
+// UNBEATABLE AI (DRUNKEN MASTER):  
 // if (any row or column contains two AI marks and zero human marks) {
 //     mark the third cell in that row or column
 // }
@@ -56,5 +57,7 @@
 // As human player marks squares, remove those winSets
 // from the AI 'memory bank.'
 
-// AI SKILL LEVELS: Random Picker, Distracted Doodler, Formidible Challenger, Unbeatable Master
-// AI RANDOM PICK PERCENTAGE: 100%; 50%; 10%; 0%
+// AI SKILL LEVELS: Random Picker, Distracted Doodler, Aloof Android (Minimax), 
+//  Schoolyard Champion, Training Unit (Minimax), Drunken Master (Unbeatable), 
+//  Supercomputer (Unbeatable, Minimax)
+// AI RANDOM PICK PERCENTAGE: 100%; 50%; 50%; 10%; 10%; 0%; 0%

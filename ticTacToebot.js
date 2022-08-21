@@ -52,19 +52,19 @@ const winChecker = state => ({
     checkWin: () => {
         let xMarks = 0;
         let oMarks = 0;
-        for (square in state.array) {
-            if (square.mark === 'X') {
+        for (square of state.array) {
+            if (square.getMark() === 'X') {
                 xMarks += 1
-            } else if (square.mark === 'O') {
-                oMarks += 1
-            };
+            } else if (square.getMark() === 'O') {
+                oMarks += 1;
+            }
         };
         if (xMarks === 3) {
-            // X WIN
+            console.log("X WIN")
         } else if (oMarks ===3) {
-            // O WIN
+            console.log("O WIN")
         };
-    };
+    }
 });
 
 const Winset = set => {
@@ -72,6 +72,13 @@ const Winset = set => {
         array: set
     }
     return Object.assign({}, arrayGetter(state), winChecker(state))
+};
+
+const WinSetGroup = set => {
+    const state = {
+        array: set
+    }
+    return Object.assign({}, arrayGetter(state))
 };
 
 const winSets = (() => {
@@ -86,9 +93,9 @@ const winSets = (() => {
     const diagonalX = Winset([topRow[0], midRow[1], bottomRow[2]]);
     const diagonalY = Winset([topRow[2], midRow[1], bottomRow[0]]);
 
-    const rowsAndColumns = [topRow, midRow, bottomRow, leftColumn, 
-        centerColumn, rightColumn];
-    const diagonals = [diagonalX, diagonalY];
+    const rowsAndColumns = WinSetGroup([topRow, midRow, bottomRow, leftColumn, 
+        centerColumn, rightColumn]);
+    const diagonals = WinSetGroup([diagonalX, diagonalY]);
 
     const state = {
         array: [rowsAndColumns, diagonals]

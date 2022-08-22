@@ -117,7 +117,7 @@ const winSets = (() => {
 })();
 
 
-// Grid:
+// Grid: 
 //  TL TC TR   X    Y   C S C
 //  ML MC MR     XY     S I S
 //  BL BC BR   Y    X   C S C

@@ -68,8 +68,22 @@ const winSetChecker = state => ({
     }
 });
 
+const skillSetter = state => ({
+    setSkill: (integer) => {
+        state.skill = integer
+    }
+})
+
 const moveMaker = state => {
     const squares = gameboard.getArray();
+    const makeAnyMove = () => {
+        for (square of squares) {
+            if (square.getMark === null) {
+                square.setMark(state.symbol);
+                winSets.checkWin();
+            }
+        }
+    }
     const makeCrucialMove = () => {
             for (square of winSet.getArray()) {
                 square.setMark(state.symbol)
@@ -77,6 +91,9 @@ const moveMaker = state => {
             winSets.checkWin();
     }
     const makeMove = () => {
+        if (state.skill < Math.floor(Math.random() * 10)) {
+            return makeAnyMove();
+        }
         for (winSet of winSets.getArray()) {
             if (winSet.countMarks(state.symbol) === 2 &&
                 winSet.countMarks(state.opponentSymbol) === 0) {
@@ -118,13 +135,9 @@ const moveMaker = state => {
                 return winSets.checkWin();
             }
         }
-        for (square of squares) {
-            if (square.getMark === null) {
-                square.setMark(state.symbol);
-                return winSets.checkWin;
-            }
-        }
+        return makeAnyMove();
     }
+
     return {makeMove}
 }
 
@@ -199,12 +212,13 @@ const winSets = (() => {
 
 const ai = (() => { 
     const state = {
+        skill: 100,
         possibleMoves: gameboard.getArray(),
         symbol: 'X',
         opponentSymbol: 'O'
     }
     return Object.assign ({}, possibleMoveUpdater(state), possibleMoveGetter(state), 
-        moveMaker(state))
+        moveMaker(state), skillSetter(state))
 })();
 
 // Grid: 

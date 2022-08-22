@@ -1,19 +1,5 @@
-
-
 const nameGetter = state => ({
     getName: () => state.name
-});
-
-const markGetter = state => ({
-    getMark: () => state.mark
-});
-
-const markSetter = state => ({
-    setMark: (symbol) => {
-        if (state.mark === null) {
-            state.mark = symbol;
-        }
-    }
 });
 
 const arrayGetter = state => ({
@@ -28,19 +14,17 @@ const positionGetter = state => ({
     getPosition: () => state.position
 })
 
-const possibleMoveGetter = state => ({
-    getPossibleMoves: () => state.possibleMoves
-})
+const markGetter = state => ({
+    getMark: () => state.mark
+});
 
-const Square = (name, position) => {
-    const state = {
-        name,
-        position,
-        mark: null
+const markSetter = state => ({
+    setMark: (symbol) => {
+        if (state.mark === null) {
+            state.mark = symbol;
+        }
     }
-    return Object.assign({}, nameGetter(state), 
-        markGetter(state), markSetter(state), positionGetter(state))
-};
+});
 
 const markCounter = state => ({
     countMarks: (symbol) => {
@@ -54,33 +38,17 @@ const markCounter = state => ({
     }
 })
 
-const gameboard = (() => {
-    const topLeft = Square('topLeft', 'corner');
-    const topCenter = Square('topCenter', 'side');
-    const topRight = Square('topRight', 'corner');
-    const midLeft = Square('midLeft', 'side');
-    const midCenter = Square('midCenter', 'inner');
-    const midRight = Square('midRight', 'side');
-    const bottomLeft = Square('bottomLeft', 'corner');
-    const bottomCenter = Square('bottomCenter', 'side');
-    const bottomRight = Square('bottomRight', 'corner');
+const possibleMoveGetter = state => ({
+    getPossibleMoves: () => state.possibleMoves
+})
 
-    const state = {
-        name: 'gameboard',
-        array: [topLeft, topCenter, topRight, midLeft, midCenter, 
-        midRight, bottomLeft, bottomCenter, bottomRight]
-    }
-
-    return Object.assign ({}, arrayGetter(state), nameGetter(state), markCounter(state));
-})();
-
-const winSetChecker = state => ({
-    checkWinSet: (winSet) => {
-        if (winSet.countMarks('X') === 3) {
-            console.log("X WIN")
-        } else if (winSet.countMarks('O') === 3) {
-            console.log("O WIN")
-        };
+const possibleMoveUpdater = state => ({
+    updatePossibleMoves: () => {
+        for (square of state.possibleMoves) {
+            if (square.getMark() !== null) {
+                state.possibleMoves.splice(state.possibleMoves.indexOf(square), 1) 
+            }
+        }
     }
 });
 
@@ -90,52 +58,13 @@ const winChecker = state => ({
     }}
 });
 
-const WinSet = set => {
-    const state = {
-        array: set
-    }
-    return Object.assign({}, arrayGetter(state), winSetChecker(state), markCounter(state))
-};
-
-const WinSetGroup = set => {
-    const state = {
-        array: set
-    }
-    return Object.assign({}, arrayGetter(state))
-};
-
-const winSets = (() => {
-    const allSquares = gameboard.getArray();
-
-    const topRow = WinSet(allSquares.slice(0, 3));
-    const midRow = WinSet(allSquares.slice(3, 6));
-    const bottomRow = WinSet(allSquares.slice(6,9));
-    const leftColumn = WinSet([allSquares[0], allSquares[3], allSquares[6]]);
-    const centerColumn = WinSet([allSquares[1], allSquares[4], allSquares[7]]);
-    const rightColumn = WinSet([allSquares[2], allSquares[5], allSquares[8]]);
-    const diagonalX = WinSet([allSquares[0], allSquares[4], allSquares[8]]);
-    const diagonalY = WinSet([allSquares[2], allSquares[4], allSquares[6]]);
-
-    const rowsAndColumns = WinSetGroup([topRow, midRow, bottomRow, leftColumn, 
-        centerColumn, rightColumn]);
-    const diagonals = WinSetGroup([diagonalX, diagonalY]);
-
-    const state = {
-        subArrays: [rowsAndColumns, diagonals],
-        array: [topRow, midRow, bottomRow, leftColumn, 
-            centerColumn, rightColumn, diagonalX, diagonalY]
-    }
-
-    return Object.assign ({}, arrayGetter(state), subArrayGetter(state), winChecker(state));
-})();
-
-const possibleMoveUpdater = state => ({
-    updatePossibleMoves: () => {
-        for (square of state.possibleMoves) {
-            if (square.getMark() !== null) {
-                state.possibleMoves.splice(state.possibleMoves.indexOf(square), 1) 
-            }
-        }
+const winSetChecker = state => ({
+    checkWinSet: (winSet) => {
+        if (winSet.countMarks('X') === 3) {
+            console.log("X WIN")
+        } else if (winSet.countMarks('O') === 3) {
+            console.log("O WIN")
+        };
     }
 });
 
@@ -198,6 +127,75 @@ const moveMaker = state => {
     }
     return {makeMove}
 }
+
+const Square = (name, position) => {
+    const state = {
+        name,
+        position,
+        mark: null
+    }
+    return Object.assign({}, nameGetter(state), 
+        markGetter(state), markSetter(state), positionGetter(state))
+};
+
+const WinSet = set => {
+    const state = {
+        array: set
+    }
+    return Object.assign({}, arrayGetter(state), winSetChecker(state), markCounter(state))
+};
+
+const WinSetGroup = set => {
+    const state = {
+        array: set
+    }
+    return Object.assign({}, arrayGetter(state))
+};
+
+const gameboard = (() => {
+    const topLeft = Square('topLeft', 'corner');
+    const topCenter = Square('topCenter', 'side');
+    const topRight = Square('topRight', 'corner');
+    const midLeft = Square('midLeft', 'side');
+    const midCenter = Square('midCenter', 'inner');
+    const midRight = Square('midRight', 'side');
+    const bottomLeft = Square('bottomLeft', 'corner');
+    const bottomCenter = Square('bottomCenter', 'side');
+    const bottomRight = Square('bottomRight', 'corner');
+
+    const state = {
+        name: 'gameboard',
+        array: [topLeft, topCenter, topRight, midLeft, midCenter, 
+        midRight, bottomLeft, bottomCenter, bottomRight]
+    }
+
+    return Object.assign ({}, arrayGetter(state), nameGetter(state), markCounter(state));
+})();
+
+const winSets = (() => {
+    const allSquares = gameboard.getArray();
+
+    const topRow = WinSet(allSquares.slice(0, 3));
+    const midRow = WinSet(allSquares.slice(3, 6));
+    const bottomRow = WinSet(allSquares.slice(6,9));
+    const leftColumn = WinSet([allSquares[0], allSquares[3], allSquares[6]]);
+    const centerColumn = WinSet([allSquares[1], allSquares[4], allSquares[7]]);
+    const rightColumn = WinSet([allSquares[2], allSquares[5], allSquares[8]]);
+    const diagonalX = WinSet([allSquares[0], allSquares[4], allSquares[8]]);
+    const diagonalY = WinSet([allSquares[2], allSquares[4], allSquares[6]]);
+
+    const rowsAndColumns = WinSetGroup([topRow, midRow, bottomRow, leftColumn, 
+        centerColumn, rightColumn]);
+    const diagonals = WinSetGroup([diagonalX, diagonalY]);
+
+    const state = {
+        subArrays: [rowsAndColumns, diagonals],
+        array: [topRow, midRow, bottomRow, leftColumn, 
+            centerColumn, rightColumn, diagonalX, diagonalY]
+    }
+
+    return Object.assign ({}, arrayGetter(state), subArrayGetter(state), winChecker(state));
+})();
 
 const ai = (() => { 
     const state = {

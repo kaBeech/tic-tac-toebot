@@ -24,6 +24,10 @@ const subArrayGetter = state => ({
     getSubArray: () => state.subArray
 })
 
+const possibleMoveGetter = state => ({
+    getPossibleMoves: () => state.possibleMoves
+})
+
 const Square = name => {
     const state = {
         name,
@@ -77,7 +81,6 @@ const winSetChecker = state => ({
 const winChecker = state => ({
     checkWin: () => {for (winSet of state.array) {
         winSet.checkWinSet(winSet);
-        // winSet.countMarks();
     }}
 });
 
@@ -120,6 +123,22 @@ const winSets = (() => {
     return Object.assign ({}, arrayGetter(state), subArrayGetter(state), winChecker(state));
 })();
 
+const possibleMoveUpdater = state => ({
+    updatePossibleMoves: () => {
+        for (square of state.possibleMoves) {
+            if (square.getMark() !== null) {
+                state.possibleMoves.splice(state.possibleMoves.indexOf(square), 1) 
+            }
+        }
+    }
+});
+
+const ai = (() => { 
+    const state = {
+        possibleMoves: gameboard.getArray(),
+    }
+    return Object.assign ({}, possibleMoveUpdater(state), possibleMoveGetter(state))
+})();
 
 // Grid: 
 //  TL TC TR   X    Y   C S C

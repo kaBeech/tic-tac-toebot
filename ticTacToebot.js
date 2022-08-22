@@ -20,6 +20,10 @@ const arrayGetter = state => ({
     getArray: () => state.array
 })
 
+const subArrayGetter = state => ({
+    getSubArray: () => state.subArray
+})
+
 const Square = name => {
     const state = {
         name,
@@ -48,8 +52,8 @@ const gameboard = (() => {
     return Object.assign ({}, arrayGetter(state), nameGetter(state));
 })();
 
-const winChecker = state => ({
-    checkWin: () => {
+const winSetChecker = state => ({
+    checkWinSet: () => {
         let xMarks = 0;
         let oMarks = 0;
         for (square of state.array) {
@@ -67,11 +71,17 @@ const winChecker = state => ({
     }
 });
 
-const Winset = set => {
+const winChecker = state => ({
+    checkWin: () => {for (winSet of state.array) {
+        winSet.checkWinSet();
+    }}
+});
+
+const WinSet = set => {
     const state = {
         array: set
     }
-    return Object.assign({}, arrayGetter(state), winChecker(state))
+    return Object.assign({}, arrayGetter(state), winSetChecker(state))
 };
 
 const WinSetGroup = set => {
@@ -84,24 +94,26 @@ const WinSetGroup = set => {
 const winSets = (() => {
     const allSquares = gameboard.getArray();
 
-    const topRow = Winset(allSquares.slice(0, 3));
-    const midRow = Winset(allSquares.slice(3, 6));
-    const bottomRow = Winset(allSquares.slice(6,));
-    const leftColumn = Winset([topRow[0], midRow[0], bottomRow[0]]);
-    const centerColumn = Winset([topRow[1], midRow[1], bottomRow[1]]);
-    const rightColumn = Winset([topRow[2], midRow[2], bottomRow[2]]);
-    const diagonalX = Winset([topRow[0], midRow[1], bottomRow[2]]);
-    const diagonalY = Winset([topRow[2], midRow[1], bottomRow[0]]);
+    const topRow = WinSet(allSquares.slice(0, 3));
+    const midRow = WinSet(allSquares.slice(3, 6));
+    const bottomRow = WinSet(allSquares.slice(6,9));
+    const leftColumn = WinSet([allSquares[0], allSquares[3], allSquares[6]]);
+    const centerColumn = WinSet([allSquares[1], allSquares[4], allSquares[7]]);
+    const rightColumn = WinSet([allSquares[2], allSquares[5], allSquares[8]]);
+    const diagonalX = WinSet([allSquares[0], allSquares[4], allSquares[8]]);
+    const diagonalY = WinSet([allSquares[2], allSquares[4], allSquares[6]]);
 
     const rowsAndColumns = WinSetGroup([topRow, midRow, bottomRow, leftColumn, 
         centerColumn, rightColumn]);
     const diagonals = WinSetGroup([diagonalX, diagonalY]);
 
     const state = {
-        array: [rowsAndColumns, diagonals]
+        subArrays: [rowsAndColumns, diagonals],
+        array: [topRow, midRow, bottomRow, leftColumn, 
+            centerColumn, rightColumn, diagonalX, diagonalY]
     }
 
-    return Object.assign ({}, arrayGetter(state));
+    return Object.assign ({}, arrayGetter(state), subArrayGetter(state), winChecker(state));
 })();
 
 

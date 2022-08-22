@@ -52,20 +52,23 @@ const gameboard = (() => {
     return Object.assign ({}, arrayGetter(state), nameGetter(state));
 })();
 
-const winSetChecker = state => ({
-    checkWinSet: () => {
-        let xMarks = 0;
-        let oMarks = 0;
+const markCounter = state => ({
+    countMarks: (symbol) => {
+        let marks = 0;
         for (square of state.array) {
-            if (square.getMark() === 'X') {
-                xMarks += 1
-            } else if (square.getMark() === 'O') {
-                oMarks += 1;
+            if (square.getMark() === symbol) {
+                marks += 1
             }
         };
-        if (xMarks === 3) {
+        return marks;
+    }
+})
+
+const winSetChecker = state => ({
+    checkWinSet: (winSet) => {
+        if (winSet.countMarks('X') === 3) {
             console.log("X WIN")
-        } else if (oMarks ===3) {
+        } else if (winSet.countMarks('O') === 3) {
             console.log("O WIN")
         };
     }
@@ -73,7 +76,8 @@ const winSetChecker = state => ({
 
 const winChecker = state => ({
     checkWin: () => {for (winSet of state.array) {
-        winSet.checkWinSet();
+        winSet.checkWinSet(winSet);
+        // winSet.countMarks();
     }}
 });
 
@@ -81,7 +85,7 @@ const WinSet = set => {
     const state = {
         array: set
     }
-    return Object.assign({}, arrayGetter(state), winSetChecker(state))
+    return Object.assign({}, arrayGetter(state), winSetChecker(state), markCounter(state))
 };
 
 const WinSetGroup = set => {

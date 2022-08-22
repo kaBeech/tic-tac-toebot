@@ -133,11 +133,28 @@ const possibleMoveUpdater = state => ({
     }
 });
 
+const moveMaker = state => ({
+    makeWinningMove: () => {
+        for (winSet of winSets.getArray()) {
+            if (winSet.countMarks(state.symbol) === 2 &&
+                winSet.countMarks(state.opponentSymbol) === 0) {
+                for (square of winSet.getArray()) {
+                    square.setMark(state.symbol)
+                    // console.log(square.getName())
+                }
+            }
+        }
+    }
+})
+
 const ai = (() => { 
     const state = {
         possibleMoves: gameboard.getArray(),
+        symbol: 'X',
+        opponentSymbol: 'O'
     }
-    return Object.assign ({}, possibleMoveUpdater(state), possibleMoveGetter(state))
+    return Object.assign ({}, possibleMoveUpdater(state), possibleMoveGetter(state), 
+        moveMaker(state))
 })();
 
 // Grid: 

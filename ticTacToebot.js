@@ -133,19 +133,29 @@ const possibleMoveUpdater = state => ({
     }
 });
 
-const moveMaker = state => ({
-    makeWinningMove: () => {
+const moveMaker = state => {
+    const makeCrucialMove = () => {
+            for (square of winSet.getArray()) {
+                square.setMark(state.symbol)
+            }
+            winSets.checkWin();
+    }
+    const makeMove = () => {
         for (winSet of winSets.getArray()) {
             if (winSet.countMarks(state.symbol) === 2 &&
                 winSet.countMarks(state.opponentSymbol) === 0) {
-                for (square of winSet.getArray()) {
-                    square.setMark(state.symbol)
-                    // console.log(square.getName())
-                }
+                return makeCrucialMove();
+            }
+        }
+        for (winSet of winSets.getArray()) {
+            if (winSet.countMarks(state.symbol) === 0 &&
+                winSet.countMarks(state.opponentSymbol) === 2) {
+                return makeCrucialMove();
             }
         }
     }
-})
+    return {makeMove}
+}
 
 const ai = (() => { 
     const state = {

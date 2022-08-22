@@ -21,31 +21,37 @@ const arrayGetter = state => ({
 })
 
 const subArrayGetter = state => ({
-    getSubArray: () => state.subArray
+    getSubArray: () => state.subArrays
+})
+
+const positionGetter = state => ({
+    getPosition: () => state.position
 })
 
 const possibleMoveGetter = state => ({
     getPossibleMoves: () => state.possibleMoves
 })
 
-const Square = name => {
+const Square = (name, position) => {
     const state = {
         name,
+        position,
         mark: null
     }
-    return Object.assign({}, nameGetter(state), markGetter(state), markSetter(state))
+    return Object.assign({}, nameGetter(state), 
+        markGetter(state), markSetter(state), positionGetter(state))
 };
 
 const gameboard = (() => {
-    const topLeft = Square('topLeft');
-    const topCenter = Square('topCenter');
-    const topRight = Square('topRight');
-    const midLeft = Square('midLeft');
-    const midCenter = Square('midCenter');
-    const midRight = Square('midRight');
-    const bottomLeft = Square('bottomLeft');
-    const bottomCenter = Square('bottomCenter');
-    const bottomRight = Square('bottomRight');
+    const topLeft = Square('topLeft', 'corner');
+    const topCenter = Square('topCenter', 'side');
+    const topRight = Square('topRight', 'corner');
+    const midLeft = Square('midLeft', 'side');
+    const midCenter = Square('midCenter', 'inner');
+    const midRight = Square('midRight', 'side');
+    const bottomLeft = Square('bottomLeft', 'corner');
+    const bottomCenter = Square('bottomCenter', 'side');
+    const bottomRight = Square('bottomRight', 'corner');
 
     const state = {
         name: 'gameboard',
@@ -151,6 +157,18 @@ const moveMaker = state => {
             if (winSet.countMarks(state.symbol) === 0 &&
                 winSet.countMarks(state.opponentSymbol) === 2) {
                 return makeCrucialMove();
+            }
+        }
+        for (winSet of winSets.getSubArray()[0].getArray()) {
+            if (winSet.countMarks(state.symbol) === 1 &&
+                winSet.countMarks(state.opponentSymbol) === 0) {
+                for (square of winSet.getArray()) {
+                    if (square.getMark() === null && 
+                        square.getPosition() === 'corner') {
+                        square.setMark(state.symbol);
+                        return winSets.checkWin();
+                    }
+                }
             }
         }
     }

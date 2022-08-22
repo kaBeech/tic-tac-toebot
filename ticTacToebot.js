@@ -42,6 +42,18 @@ const Square = (name, position) => {
         markGetter(state), markSetter(state), positionGetter(state))
 };
 
+const markCounter = state => ({
+    countMarks: (symbol) => {
+        let marks = 0;
+        for (square of state.array) {
+            if (square.getMark() === symbol) {
+                marks += 1
+            }
+        };
+        return marks;
+    }
+})
+
 const gameboard = (() => {
     const topLeft = Square('topLeft', 'corner');
     const topCenter = Square('topCenter', 'side');
@@ -59,20 +71,8 @@ const gameboard = (() => {
         midRight, bottomLeft, bottomCenter, bottomRight]
     }
 
-    return Object.assign ({}, arrayGetter(state), nameGetter(state));
+    return Object.assign ({}, arrayGetter(state), nameGetter(state), markCounter(state));
 })();
-
-const markCounter = state => ({
-    countMarks: (symbol) => {
-        let marks = 0;
-        for (square of state.array) {
-            if (square.getMark() === symbol) {
-                marks += 1
-            }
-        };
-        return marks;
-    }
-})
 
 const winSetChecker = state => ({
     checkWinSet: (winSet) => {
@@ -140,6 +140,7 @@ const possibleMoveUpdater = state => ({
 });
 
 const moveMaker = state => {
+    const squares = gameboard.getArray();
     const makeCrucialMove = () => {
             for (square of winSet.getArray()) {
                 square.setMark(state.symbol)
@@ -169,6 +170,29 @@ const moveMaker = state => {
                         return winSets.checkWin();
                     }
                 }
+            }
+        }
+        if (gameboard.countMarks(state.symbol) === 0 &&
+            gameboard.countMarks(state.opponentSymbol) === 1) {
+            for (square of squares) {
+                if (square.getMark() === opponentSymbol && 
+                    square.getPosition() === 'corner') {
+                    squares[4].setMark(state.symbol);
+                    return winSets.checkWin();
+                }
+            }
+        }
+        for (square of squares) {
+            if (square.getPosition() === 'corner' && 
+                square.getMark() === null) {
+                square.setMark(state.symbol);
+                return winSets.checkWin();
+            }
+        }
+        for (square of squares) {
+            if (square.getMark === null) {
+                square.setMark(state.symbol);
+                return winSets.checkWin;
             }
         }
     }

@@ -1,3 +1,5 @@
+const DOMSquares = document.querySelectorAll('.boardSquare');
+
 const nameGetter = state => ({
     getName: () => state.name
 });
@@ -219,4 +221,14 @@ const ai = (() => {
     }
     return Object.assign ({}, possibleMoveUpdater(state), possibleMoveGetter(state), 
         moveMaker(state), skillSetter(state))
+})();
+
+const gameDirector = (() => {
+    const state = {
+        name: 'gameDirector',
+        currentTurn: 'player2',
+        player1Symbol: 'X',
+        player2Symbol: 'O'
+    }
+    return Object.assign ({}, nameGetter(state))
 })();

@@ -4,11 +4,28 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toebot</title>
+    <title>Tic-Tac-Toebot</title>
     <link rel="stylesheet" href="style.css">
     <script src="ticTacToebot.js" defer></script>
 </head>
-<body>
-    
+<body class="flex column">
+    <h1 id="title">Tic-Tac-Toebot</h1>
+    <div id="gameboard" class="flex column">
+        <div class="flex">
+            <div id="topLeft" class="boardSquare">X</div>
+            <div id="topCenter" class="boardSquare">O</div>
+            <div id="topRight" class="boardSquare">X</div>
+        </div>
+        <div class="flex">
+            <div id="minLeft" class="boardSquare">O</div>
+            <div id="midCenter" class="boardSquare">X</div>
+            <div id="midRight" class="boardSquare">O</div>
+        </div>
+        <div class="flex">
+            <div id="bottomLeft" class="boardSquare">X</div>
+            <div id="bottomCenter" class="boardSquare">O</div>
+            <div id="bottomRight" class="boardSquare">X</div>
+        </div>
+    </div>
 </body>
 </html>

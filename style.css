@@ -1,0 +1,23 @@
+body {
+    align-items: center;
+    background-color: #000408;
+    color: #def;
+}
+
+.flex {
+    display: flex;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.boardSquare {
+    width: 8rem;
+    aspect-ratio: 1;
+    border-style: solid;
+    font-size: 7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

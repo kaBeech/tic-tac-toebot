@@ -12,7 +12,7 @@ body {
     flex-direction: column;
 }
 
-.boardSquare {
+.gameSquare {
     width: 8rem;
     aspect-ratio: 1;
     border-style: solid;

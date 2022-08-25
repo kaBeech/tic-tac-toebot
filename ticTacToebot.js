@@ -1,4 +1,12 @@
-const DOMSquares = document.querySelectorAll('.boardSquare');
+const domAssigner = state => ({
+    assignSquares: () => {
+        const domSquares = document.querySelectorAll('.gameSquare');
+
+        for (domSquare of domSquares) {
+            domSquare.addEventListener('click', function() {gameDirector.applyMoveSelection(domSquare.id)})
+    }}
+})
+
 
 const nameGetter = state => ({
     getName: () => state.name

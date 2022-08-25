@@ -231,6 +231,8 @@ const ai = (() => {
         moveMaker(state), skillSetter(state))
 })();
 
+
+
 const gameDirector = (() => {
     const state = {
         name: 'gameDirector',
@@ -240,3 +242,11 @@ const gameDirector = (() => {
     }
     return Object.assign ({}, nameGetter(state))
 })();
+
+// gameDirector flow:
+// 1) Initialize Board or increment currentTurn
+// 2) Notify Player of Turn
+// 3) Process Player's turn selection
+// 4) Check if the player has won. If they have, celebrate!
+//
+//

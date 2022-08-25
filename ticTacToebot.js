@@ -231,7 +231,32 @@ const ai = (() => {
         moveMaker(state), skillSetter(state))
 })();
 
+const rainbowHueGetter = state => ({
+    getRainbowHue: () => state.rainbowHue
+});
 
+const rainbowShifter = state => ({
+    shiftRainbow: () => {if (state.rainbowHue < 360) {
+        state.rainbowHue++;
+    } else {
+        state.rainbowHue = 1;
+    }}
+});
+
+const colorUpdater = state => ({
+    updateColor: () => document.querySelector('body').style.color = 
+        `hsl(${state.rainbowHue}, 100%, 80%)`
+})
+
+const colorController = (() => {
+    const state = {
+        rainbowHue: Math.floor(Math.random() * 360),
+        body: document.querySelector('body'),
+    };
+    // setInterval(shiftRainbow, 250);
+    // updateColor();
+    return Object.assign ({}, rainbowShifter(state), colorUpdater(state));
+})();
 
 const gameDirector = (() => {
     const state = {

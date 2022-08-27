@@ -258,20 +258,28 @@ const colorController = (() => {
     return Object.assign ({}, rainbowShifter(state), colorUpdater(state));
 })();
 
+const moveSelectionApplicator = state => ({
+    applyMoveSelection: (domSquareID) => {
+        domSquareID.setMark(state.currentSymbol);
+    }
+})
+
 const gameDirector = (() => {
     const state = {
         name: 'gameDirector',
         currentTurn: 'player2',
+        currentSymbol: 'O',
         player1Symbol: 'X',
-        player2Symbol: 'O'
+        player2Symbol: 'O',
+        lastCompletedProcess: null
     }
-    return Object.assign ({}, nameGetter(state))
+    return Object.assign ({}, nameGetter(state), moveSelectionApplicator(state))
 })();
 
 // gameDirector flow:
 // 1) Initialize Board or increment currentTurn
 // 2) Notify Player of Turn
-// 3) Process Player's turn selection
-// 4) Check if the player has won. If they have, celebrate!
+// 3) Process Player's turn selection : gamedirector.applyMoveSelection()
+// 4) Check if the player has won. If they have, celebrate! : gamedirector.checkWin()
 //
 //

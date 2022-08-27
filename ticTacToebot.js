@@ -7,6 +7,14 @@ const domAssigner = state => ({
     }}
 })
 
+const domSquareClearer = state => ({
+    clearSquares: () => {
+        const domSquares = document.querySelectorAll('.gameSquare');
+
+        for (domSquare of domSquares) {
+            domSquare.innerHTML = '';
+    }}
+})
 
 const nameGetter = state => ({
     getName: () => state.name
@@ -259,14 +267,16 @@ const colorController = (() => {
 })();
 
 const playerNotifier = state => ({
-    notifyCurrentPlayer: () = {
+    notifyCurrentPlayer: () => {
         console.log(`${state.currentPlayerTurn}, it is your turn!`);
     }
 });
 
 const moveSelectionApplicator = state => ({
     applyMoveSelection: (domSquareID) => {
-        domSquareID.setMark(state.currentSymbol);
+        const selectedSquare = document.querySelector('#' + domSquareID)
+        selectedSquare.innerHTML = state.currentSymbol;
+        // domSquareID.setMark(state.currentSymbol);
     }
 });
 
@@ -279,7 +289,7 @@ const gameDirector = (() => {
         player2Symbol: 'O',
         lastCompletedProcess: null
     }
-    return Object.assign ({}, nameGetter(state), domAssigner(state), playerNotifier(state), moveSelectionApplicator(state), winChecker(winSets.state))
+    return Object.assign ({}, nameGetter(state), domSquareClearer(state), domAssigner(state), playerNotifier(state), moveSelectionApplicator(state), winChecker(winSets.state))
 })();
 
 // gameDirector flow:

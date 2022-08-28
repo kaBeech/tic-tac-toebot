@@ -2,7 +2,7 @@ const domAssigner = state => ({
     assignSquares: () => {
         const domSquares = document.querySelectorAll('.gameSquare');
 
-        for (domSquare of domSquares) {
+        for (let domSquare of domSquares) {
             domSquare.addEventListener('click', function() {gameDirector.applyMoveSelection(domSquare.id)})
     }}
 })
@@ -11,7 +11,7 @@ const domSquareClearer = state => ({
     clearSquares: () => {
         const domSquares = document.querySelectorAll('.gameSquare');
 
-        for (domSquare of domSquares) {
+        for (let domSquare of domSquares) {
             domSquare.innerHTML = '';
     }}
 })
@@ -47,11 +47,11 @@ const markSetter = state => ({
 const markCounter = state => ({
     countMarks: (symbol) => {
         let marks = 0;
-        for (square of state.array) {
+        for (let square of state.array) {
             if (square.getMark() === symbol) {
                 marks += 1
             }
-        };
+        }
         return marks;
     }
 })
@@ -62,7 +62,7 @@ const possibleMoveGetter = state => ({
 
 const possibleMoveUpdater = state => ({
     updatePossibleMoves: () => {
-        for (square of state.possibleMoves) {
+        for (let square of state.possibleMoves) {
             if (square.getMark() !== null) {
                 state.possibleMoves.splice(state.possibleMoves.indexOf(square), 1) 
             }
@@ -71,7 +71,7 @@ const possibleMoveUpdater = state => ({
 });
 
 const winChecker = state => ({
-    checkWin: () => {for (winSet of state.array) {
+    checkWin: () => {for (let winSet of state.array) {
         winSet.checkWinSet(winSet);
     }}
 });
@@ -82,7 +82,7 @@ const winSetChecker = state => ({
             console.log("X WIN")
         } else if (winSet.countMarks('O') === 3) {
             console.log("O WIN")
-        };
+        }
     }
 });
 
@@ -95,7 +95,7 @@ const skillSetter = state => ({
 const moveMaker = state => {
     const squares = gameboard.getArray();
     const makeAnyMove = () => {
-        for (square of squares) {
+        for (let square of squares) {
             if (square.getMark === null) {
                 square.setMark(state.symbol);
                 winSets.checkWin();
@@ -103,7 +103,7 @@ const moveMaker = state => {
         }
     }
     const makeCrucialMove = () => {
-            for (square of winSet.getArray()) {
+            for (let square of winSets.getArray()) {
                 square.setMark(state.symbol)
             }
             winSets.checkWin();
@@ -112,22 +112,22 @@ const moveMaker = state => {
         if (state.skill < Math.floor(Math.random() * 10)) {
             return makeAnyMove();
         }
-        for (winSet of winSets.getArray()) {
+        for (let winSet of winSets.getArray()) {
             if (winSet.countMarks(state.symbol) === 2 &&
                 winSet.countMarks(state.opponentSymbol) === 0) {
                 return makeCrucialMove();
             }
         }
-        for (winSet of winSets.getArray()) {
+        for (let winSet of winSets.getArray()) {
             if (winSet.countMarks(state.symbol) === 0 &&
                 winSet.countMarks(state.opponentSymbol) === 2) {
                 return makeCrucialMove();
             }
         }
-        for (winSet of winSets.getSubArray()[0].getArray()) {
+        for (let winSet of winSets.getSubArray()[0].getArray()) {
             if (winSet.countMarks(state.symbol) === 1 &&
                 winSet.countMarks(state.opponentSymbol) === 0) {
-                for (square of winSet.getArray()) {
+                for (let square of winSet.getArray()) {
                     if (square.getMark() === null && 
                         square.getPosition() === 'corner') {
                         square.setMark(state.symbol);
@@ -138,15 +138,15 @@ const moveMaker = state => {
         }
         if (gameboard.countMarks(state.symbol) === 0 &&
             gameboard.countMarks(state.opponentSymbol) === 1) {
-            for (square of squares) {
-                if (square.getMark() === opponentSymbol && 
+            for (let square of squares) {
+                if (square.getMark() === state.opponentSymbol && 
                     square.getPosition() === 'corner') {
                     squares[4].setMark(state.symbol);
                     return winSets.checkWin();
                 }
             }
         }
-        for (square of squares) {
+        for (let square of squares) {
             if (square.getPosition() === 'corner' && 
                 square.getMark() === null) {
                 square.setMark(state.symbol);

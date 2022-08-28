@@ -1,0 +1,25 @@
+{
+  "name": "tic-tac-toebot",
+  "version": "1.0.0",
+  "description": "A tic tac toe web game with a computer player",
+  "main": "ticTacToebot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaBeech/tic-tac-toebot.git"
+  },
+  "author": "Kyle Beechly",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kaBeech/tic-tac-toebot/issues"
+  },
+  "homepage": "https://github.com/kaBeech/tic-tac-toebot#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
+    "eslint": "^8.23.0",
+    "eslint-plugin-react": "^7.31.1"
+  }
+}

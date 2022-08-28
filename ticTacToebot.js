@@ -363,10 +363,11 @@ const colorController = (() => {
     rainbowHue: Math.floor(Math.random() * 360),
     body: document.querySelector("body"),
   };
-  // setInterval(shiftRainbow, 250);
-  // updateColor();
   return { ...rainbowShifter(state), ...colorUpdater(state)};
 })();
+
+setInterval(colorController.shiftRainbow, 250);
+setInterval(colorController.updateColor, 250);
 
 // gameDirector flow:
 // 1) Initialize Board or increment currentPlayerTurn : gamedirector.assignSquares()

@@ -85,7 +85,7 @@ const gameboard = (() => {
   };
 })();
 
-const winSetChecker = (state) => ({
+const winSetChecker = () => ({
   checkWinSet: (winSet) => {
     if (winSet.countMarks("X") === 3) {
       console.log("X WIN");
@@ -170,7 +170,7 @@ const winSets = (() => {
   };
 })();
 
-const domSquareClearer = (state) => ({
+const domSquareClearer = () => ({
   clearSquares: () => {
     const domSquares = document.querySelectorAll(".gameSquare");
 
@@ -180,7 +180,7 @@ const domSquareClearer = (state) => ({
   },
 });
 
-const domAssigner = (state) => ({
+const domAssigner = () => ({
   assignSquares: () => {
     const domSquares = document.querySelectorAll(".gameSquare");
 

@@ -184,6 +184,7 @@ const domSquareClearer = () => ({
 const domAssigner = () => ({
   assignSquares: () => {
     const domSquares = document.querySelectorAll(".gameSquare");
+    const newGameButton = document.querySelector("#newGameButton");
 
     for (const domSquare of domSquares) {
       domSquare.addEventListener("click", () => {
@@ -191,6 +192,9 @@ const domAssigner = () => ({
         gameDirector.applyMoveSelection(domSquare.id);
       });
     }
+    newGameButton.addEventListener("click", () => {
+      gameDirector.clearSquares();
+    } )
   },
 });
 
@@ -367,6 +371,8 @@ const colorController = (() => {
 
 setInterval(colorController.shiftRainbow, 250);
 setInterval(colorController.updateColor, 250);
+
+gameDirector.assignSquares();
 
 // gameDirector flow:
 // 1) Initialize Board or increment currentPlayerTurn : gamedirector.assignSquares()

@@ -4,18 +4,6 @@ const nameGetter = (state) => ({
   getName: () => state.name,
 });
 
-const arrayGetter = (state) => ({
-  getArray: () => state.array,
-});
-
-const subArrayGetter = (state) => ({
-  getSubArray: () => state.subArrays,
-});
-
-const positionGetter = (state) => ({
-  getPosition: () => state.position,
-});
-
 const markGetter = (state) => ({
   getMark: () => state.mark,
 });
@@ -28,16 +16,8 @@ const markSetter = (state) => ({
   },
 });
 
-const markCounter = (state) => ({
-  countMarks: (symbol) => {
-    let marks = 0;
-    for (const square of state.array) {
-      if (square.getMark() === symbol) {
-        marks += 1;
-      }
-    }
-    return marks;
-  },
+const positionGetter = (state) => ({
+  getPosition: () => state.position,
 });
 
 const Square = (name, position) => {
@@ -54,6 +34,22 @@ const Square = (name, position) => {
     ...positionGetter(state)
   };
 };
+
+const arrayGetter = (state) => ({
+  getArray: () => state.array,
+});
+
+const markCounter = (state) => ({
+  countMarks: (symbol) => {
+    let marks = 0;
+    for (const square of state.array) {
+      if (square.getMark() === symbol) {
+        marks += 1;
+      }
+    }
+    return marks;
+  },
+});
 
 const gameboard = (() => {
   const topLeft = Square("topLeft", "corner");
@@ -83,8 +79,8 @@ const gameboard = (() => {
 
   return {
     
-    ...arrayGetter(state),
     ...nameGetter(state),
+    ...arrayGetter(state),
     ...markCounter(state)
   };
 })();
@@ -110,6 +106,10 @@ const WinSet = (set) => {
     ...markCounter(state)
   };
 };
+
+const subArrayGetter = (state) => ({
+  getSubArray: () => state.subArrays,
+});
 
 const winChecker = (state) => ({
   checkWin: () => {
@@ -170,6 +170,16 @@ const winSets = (() => {
   };
 })();
 
+const domSquareClearer = (state) => ({
+  clearSquares: () => {
+    const domSquares = document.querySelectorAll(".gameSquare");
+
+    for (const domSquare of domSquares) {
+      domSquare.textContent = "";
+    }
+  },
+});
+
 const domAssigner = (state) => ({
   assignSquares: () => {
     const domSquares = document.querySelectorAll(".gameSquare");
@@ -178,16 +188,6 @@ const domAssigner = (state) => ({
       domSquare.addEventListener("click", () => {
         gameDirector.applyMoveSelection(domSquare.id);
       });
-    }
-  },
-});
-
-const domSquareClearer = (state) => ({
-  clearSquares: () => {
-    const domSquares = document.querySelectorAll(".gameSquare");
-
-    for (const domSquare of domSquares) {
-      domSquare.textContent = "";
     }
   },
 });
@@ -226,10 +226,6 @@ const gameDirector = (() => {
   };
 })();
 
-const possibleMoveGetter = (state) => ({
-  getPossibleMoves: () => state.possibleMoves,
-});
-
 const possibleMoveUpdater = (state) => ({
   updatePossibleMoves: () => {
     for (const square of state.possibleMoves) {
@@ -240,10 +236,8 @@ const possibleMoveUpdater = (state) => ({
   },
 });
 
-const skillSetter = (state) => ({
-  setSkill: (integer) => {
-    state.skill = integer;
-  },
+const possibleMoveGetter = (state) => ({
+  getPossibleMoves: () => state.possibleMoves,
 });
 
 const moveMaker = (state) => {
@@ -320,6 +314,12 @@ const moveMaker = (state) => {
 
   return { makeMove };
 };
+
+const skillSetter = (state) => ({
+  setSkill: (integer) => {
+    state.skill = integer;
+  },
+});
 
 const ai = (() => {
   const state = {

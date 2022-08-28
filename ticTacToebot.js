@@ -337,10 +337,6 @@ const ai = (() => {
   };
 })();
 
-const rainbowHueGetter = (state) => ({
-  getRainbowHue: () => state.rainbowHue,
-});
-
 const rainbowShifter = (state) => ({
   shiftRainbow: () => {
     if (state.rainbowHue < 360) {

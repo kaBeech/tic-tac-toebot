@@ -187,7 +187,7 @@ const domSquareClearer = (state) => ({
     const domSquares = document.querySelectorAll(".gameSquare");
 
     for (const domSquare of domSquares) {
-      domSquare.innerHTML = "";
+      domSquare.textContent = "";
     }
   },
 });
@@ -201,7 +201,7 @@ const playerNotifier = (state) => ({
 const moveSelectionApplicator = (state) => ({
   applyMoveSelection: (domSquareID) => {
     const selectedSquare = document.querySelector(`#${  domSquareID}`);
-    selectedSquare.innerHTML = state.currentSymbol;
+    selectedSquare.textContent = state.currentSymbol;
     // domSquareID.setMark(state.currentSymbol);
   },
 });

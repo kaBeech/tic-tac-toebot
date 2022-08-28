@@ -1,24 +1,4 @@
-const domAssigner = (state) => ({
-  assignSquares: () => {
-    const domSquares = document.querySelectorAll(".gameSquare");
-
-    for (let domSquare of domSquares) {
-      domSquare.addEventListener("click", function () {
-        gameDirector.applyMoveSelection(domSquare.id);
-      });
-    }
-  },
-});
-
-const domSquareClearer = (state) => ({
-  clearSquares: () => {
-    const domSquares = document.querySelectorAll(".gameSquare");
-
-    for (let domSquare of domSquares) {
-      domSquare.innerHTML = "";
-    }
-  },
-});
+/* eslint-disable no-restricted-syntax */
 
 const nameGetter = (state) => ({
   getName: () => state.name,
@@ -51,7 +31,7 @@ const markSetter = (state) => ({
 const markCounter = (state) => ({
   countMarks: (symbol) => {
     let marks = 0;
-    for (let square of state.array) {
+    for (const square of state.array) {
       if (square.getMark() === symbol) {
         marks += 1;
       }
@@ -60,151 +40,19 @@ const markCounter = (state) => ({
   },
 });
 
-const possibleMoveGetter = (state) => ({
-  getPossibleMoves: () => state.possibleMoves,
-});
-
-const possibleMoveUpdater = (state) => ({
-  updatePossibleMoves: () => {
-    for (let square of state.possibleMoves) {
-      if (square.getMark() !== null) {
-        state.possibleMoves.splice(state.possibleMoves.indexOf(square), 1);
-      }
-    }
-  },
-});
-
-const winChecker = (state) => ({
-  checkWin: () => {
-    for (let winSet of state.array) {
-      winSet.checkWinSet(winSet);
-    }
-  },
-});
-
-const winSetChecker = (state) => ({
-  checkWinSet: (winSet) => {
-    if (winSet.countMarks("X") === 3) {
-      console.log("X WIN");
-    } else if (winSet.countMarks("O") === 3) {
-      console.log("O WIN");
-    }
-  },
-});
-
-const skillSetter = (state) => ({
-  setSkill: (integer) => {
-    state.skill = integer;
-  },
-});
-
-const moveMaker = (state) => {
-  const squares = gameboard.getArray();
-  const makeAnyMove = () => {
-    for (let square of squares) {
-      if (square.getMark === null) {
-        square.setMark(state.symbol);
-        winSets.checkWin();
-      }
-    }
-  };
-  const makeCrucialMove = () => {
-    for (let square of winSets.getArray()) {
-      square.setMark(state.symbol);
-    }
-    winSets.checkWin();
-  };
-  const makeMove = () => {
-    if (state.skill < Math.floor(Math.random() * 10)) {
-      return makeAnyMove();
-    }
-    for (let winSet of winSets.getArray()) {
-      if (
-        winSet.countMarks(state.symbol) === 2 &&
-        winSet.countMarks(state.opponentSymbol) === 0
-      ) {
-        return makeCrucialMove();
-      }
-    }
-    for (let winSet of winSets.getArray()) {
-      if (
-        winSet.countMarks(state.symbol) === 0 &&
-        winSet.countMarks(state.opponentSymbol) === 2
-      ) {
-        return makeCrucialMove();
-      }
-    }
-    for (let winSet of winSets.getSubArray()[0].getArray()) {
-      if (
-        winSet.countMarks(state.symbol) === 1 &&
-        winSet.countMarks(state.opponentSymbol) === 0
-      ) {
-        for (let square of winSet.getArray()) {
-          if (square.getMark() === null && square.getPosition() === "corner") {
-            square.setMark(state.symbol);
-            return winSets.checkWin();
-          }
-        }
-      }
-    }
-    if (
-      gameboard.countMarks(state.symbol) === 0 &&
-      gameboard.countMarks(state.opponentSymbol) === 1
-    ) {
-      for (let square of squares) {
-        if (
-          square.getMark() === state.opponentSymbol &&
-          square.getPosition() === "corner"
-        ) {
-          squares[4].setMark(state.symbol);
-          return winSets.checkWin();
-        }
-      }
-    }
-    for (let square of squares) {
-      if (square.getPosition() === "corner" && square.getMark() === null) {
-        square.setMark(state.symbol);
-        return winSets.checkWin();
-      }
-    }
-    return makeAnyMove();
-  };
-
-  return { makeMove };
-};
-
 const Square = (name, position) => {
   const state = {
     name,
     position,
     mark: null,
   };
-  return Object.assign(
-    {},
-    nameGetter(state),
-    markGetter(state),
-    markSetter(state),
-    positionGetter(state)
-  );
-};
-
-const WinSet = (set) => {
-  const state = {
-    array: set,
+  return {
+    
+    ...nameGetter(state),
+    ...markGetter(state),
+    ...markSetter(state),
+    ...positionGetter(state)
   };
-  return Object.assign(
-    {},
-    arrayGetter(state),
-    winSetChecker(state),
-    markCounter(state)
-  );
-};
-
-const WinSetGroup = (set) => {
-  const state = {
-    array: set,
-  };
-  return Object.assign({}, arrayGetter(state));
 };
 
 const gameboard = (() => {
@@ -233,13 +81,43 @@ const gameboard = (() => {
     ],
   };
 
-  return Object.assign(
-    {},
-    arrayGetter(state),
-    nameGetter(state),
-    markCounter(state)
-  );
+  return {
+    
+    ...arrayGetter(state),
+    ...nameGetter(state),
+    ...markCounter(state)
+  };
 })();
+
+const winSetChecker = (state) => ({
+  checkWinSet: (winSet) => {
+    if (winSet.countMarks("X") === 3) {
+      console.log("X WIN");
+    } else if (winSet.countMarks("O") === 3) {
+      console.log("O WIN");
+    }
+  },
+});
+
+const WinSet = (set) => {
+  const state = {
+    array: set,
+  };
+  return {
+    
+    ...arrayGetter(state),
+    ...winSetChecker(state),
+    ...markCounter(state)
+  };
+};
+
+const winChecker = (state) => ({
+  checkWin: () => {
+    for (const winSet of state.array) {
+      winSet.checkWinSet(winSet);
+    }
+  },
+});
 
 const winSets = (() => {
   const allSquares = gameboard.getArray();
@@ -252,6 +130,13 @@ const winSets = (() => {
   const rightColumn = WinSet([allSquares[2], allSquares[5], allSquares[8]]);
   const diagonalX = WinSet([allSquares[0], allSquares[4], allSquares[8]]);
   const diagonalY = WinSet([allSquares[2], allSquares[4], allSquares[6]]);
+
+  const WinSetGroup = (set) => {
+    const state = {
+      array: set,
+    };
+    return { ...arrayGetter(state)};
+  };
 
   const rowsAndColumns = WinSetGroup([
     topRow,
@@ -277,60 +162,35 @@ const winSets = (() => {
     ],
   };
 
-  return Object.assign(
-    {},
-    arrayGetter(state),
-    subArrayGetter(state),
-    winChecker(state)
-  );
-})();
-
-const ai = (() => {
-  const state = {
-    skill: 100,
-    possibleMoves: gameboard.getArray(),
-    symbol: "X",
-    opponentSymbol: "O",
+  return {
+    
+    ...arrayGetter(state),
+    ...subArrayGetter(state),
+    ...winChecker(state)
   };
-  return Object.assign(
-    {},
-    possibleMoveUpdater(state),
-    possibleMoveGetter(state),
-    moveMaker(state),
-    skillSetter(state)
-  );
 })();
 
-const rainbowHueGetter = (state) => ({
-  getRainbowHue: () => state.rainbowHue,
-});
+const domAssigner = (state) => ({
+  assignSquares: () => {
+    const domSquares = document.querySelectorAll(".gameSquare");
 
-const rainbowShifter = (state) => ({
-  shiftRainbow: () => {
-    if (state.rainbowHue < 360) {
-      state.rainbowHue++;
-    } else {
-      state.rainbowHue = 1;
+    for (const domSquare of domSquares) {
+      domSquare.addEventListener("click", () => {
+        gameDirector.applyMoveSelection(domSquare.id);
+      });
     }
   },
 });
 
-const colorUpdater = (state) => ({
-  updateColor: () =>
-    (document.querySelector(
-      "body"
-    ).style.color = `hsl(${state.rainbowHue}, 100%, 80%)`),
-});
+const domSquareClearer = (state) => ({
+  clearSquares: () => {
+    const domSquares = document.querySelectorAll(".gameSquare");
 
-const colorController = (() => {
-  const state = {
-    rainbowHue: Math.floor(Math.random() * 360),
-    body: document.querySelector("body"),
-  };
-  // setInterval(shiftRainbow, 250);
-  // updateColor();
-  return Object.assign({}, rainbowShifter(state), colorUpdater(state));
-})();
+    for (const domSquare of domSquares) {
+      domSquare.innerHTML = "";
+    }
+  },
+});
 
 const playerNotifier = (state) => ({
   notifyCurrentPlayer: () => {
@@ -340,7 +200,7 @@ const playerNotifier = (state) => ({
 
 const moveSelectionApplicator = (state) => ({
   applyMoveSelection: (domSquareID) => {
-    const selectedSquare = document.querySelector("#" + domSquareID);
+    const selectedSquare = document.querySelector(`#${  domSquareID}`);
     selectedSquare.innerHTML = state.currentSymbol;
     // domSquareID.setMark(state.currentSymbol);
   },
@@ -355,15 +215,157 @@ const gameDirector = (() => {
     player2Symbol: "O",
     lastCompletedProcess: null,
   };
-  return Object.assign(
-    {},
-    nameGetter(state),
-    domSquareClearer(state),
-    domAssigner(state),
-    playerNotifier(state),
-    moveSelectionApplicator(state),
-    winChecker(winSets.state)
-  );
+  return {
+    
+    ...nameGetter(state),
+    ...domSquareClearer(state),
+    ...domAssigner(state),
+    ...playerNotifier(state),
+    ...moveSelectionApplicator(state),
+    ...winChecker(winSets.state)
+  };
+})();
+
+const possibleMoveGetter = (state) => ({
+  getPossibleMoves: () => state.possibleMoves,
+});
+
+const possibleMoveUpdater = (state) => ({
+  updatePossibleMoves: () => {
+    for (const square of state.possibleMoves) {
+      if (square.getMark() !== null) {
+        state.possibleMoves.splice(state.possibleMoves.indexOf(square), 1);
+      }
+    }
+  },
+});
+
+const skillSetter = (state) => ({
+  setSkill: (integer) => {
+    state.skill = integer;
+  },
+});
+
+const moveMaker = (state) => {
+  const squares = gameboard.getArray();
+  const makeAnyMove = () => {
+    for (const square of squares) {
+      if (square.getMark === null) {
+        square.setMark(state.symbol);
+        winSets.checkWin();
+      }
+    }
+  };
+  const makeCrucialMove = () => {
+    for (const square of winSets.getArray()) {
+      square.setMark(state.symbol);
+    }
+    winSets.checkWin();
+  };
+  const makeMove = () => {
+    if (state.skill < Math.floor(Math.random() * 10)) {
+      return makeAnyMove();
+    }
+    for (const winSet of winSets.getArray()) {
+      if (
+        winSet.countMarks(state.symbol) === 2 &&
+        winSet.countMarks(state.opponentSymbol) === 0
+      ) {
+        return makeCrucialMove();
+      }
+    }
+    for (const winSet of winSets.getArray()) {
+      if (
+        winSet.countMarks(state.symbol) === 0 &&
+        winSet.countMarks(state.opponentSymbol) === 2
+      ) {
+        return makeCrucialMove();
+      }
+    }
+    for (const winSet of winSets.getSubArray()[0].getArray()) {
+      if (
+        winSet.countMarks(state.symbol) === 1 &&
+        winSet.countMarks(state.opponentSymbol) === 0
+      ) {
+        for (const square of winSet.getArray()) {
+          if (square.getMark() === null && square.getPosition() === "corner") {
+            square.setMark(state.symbol);
+            return winSets.checkWin();
+          }
+        }
+      }
+    }
+    if (
+      gameboard.countMarks(state.symbol) === 0 &&
+      gameboard.countMarks(state.opponentSymbol) === 1
+    ) {
+      for (const square of squares) {
+        if (
+          square.getMark() === state.opponentSymbol &&
+          square.getPosition() === "corner"
+        ) {
+          squares[4].setMark(state.symbol);
+          return winSets.checkWin();
+        }
+      }
+    }
+    for (const square of squares) {
+      if (square.getPosition() === "corner" && square.getMark() === null) {
+        square.setMark(state.symbol);
+        return winSets.checkWin();
+      }
+    }
+    return makeAnyMove();
+  };
+
+  return { makeMove };
+};
+
+const ai = (() => {
+  const state = {
+    skill: 100,
+    possibleMoves: gameboard.getArray(),
+    symbol: "X",
+    opponentSymbol: "O",
+  };
+  return {
+    
+    ...possibleMoveUpdater(state),
+    ...possibleMoveGetter(state),
+    ...moveMaker(state),
+    ...skillSetter(state)
+  };
+})();
+
+const rainbowHueGetter = (state) => ({
+  getRainbowHue: () => state.rainbowHue,
+});
+
+const rainbowShifter = (state) => ({
+  shiftRainbow: () => {
+    if (state.rainbowHue < 360) {
+      state.rainbowHue += 1;
+    } else {
+      state.rainbowHue = 1;
+    }
+  },
+});
+
+const colorUpdater = (state) => ({
+  updateColor: () =>
+    {(document.querySelector(
+      "body"
+    ).style.color = `hsl(${state.rainbowHue}, 100%, 80%)`)},
+});
+
+const colorController = (() => {
+  const state = {
+    rainbowHue: Math.floor(Math.random() * 360),
+    body: document.querySelector("body"),
+  };
+  // setInterval(shiftRainbow, 250);
+  // updateColor();
+  return { ...rainbowShifter(state), ...colorUpdater(state)};
 })();
 
 // gameDirector flow:

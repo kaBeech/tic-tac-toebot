@@ -87,10 +87,11 @@ const gameboard = (() => {
 
 const winSetChecker = () => ({
   checkWinSet: (winSet) => {
+    const winText = document.querySelector('#winText');
     if (winSet.countMarks("X") === 3) {
-      console.log("X WIN");
+      winText.textContent = "X WINS";
     } else if (winSet.countMarks("O") === 3) {
-      console.log("O WIN");
+      winText.textContent = "O WINS";
     }
   },
 });
@@ -186,6 +187,7 @@ const domAssigner = () => ({
 
     for (const domSquare of domSquares) {
       domSquare.addEventListener("click", () => {
+        // eslint-disable-next-line no-use-before-define
         gameDirector.applyMoveSelection(domSquare.id);
       });
     }

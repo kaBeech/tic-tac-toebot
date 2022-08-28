@@ -171,6 +171,18 @@ const winSets = (() => {
   };
 })();
 
+const gameController = (state) => ({
+  controlGame: () => {
+    switch(state.lastCompletedProcess) {
+      case 'newGame':
+        console.log('Success!')
+        break;
+      default:
+        break;
+    }
+  }
+});
+
 const domSquareClearer = () => ({
   clearSquares: () => {
     const domSquares = document.querySelectorAll(".gameSquare");
@@ -193,7 +205,12 @@ const domAssigner = () => ({
       });
     }
     newGameButton.addEventListener("click", () => {
+      // eslint-disable-next-line no-use-before-define
       gameDirector.clearSquares();
+      // eslint-disable-next-line no-use-before-define
+      gameDirector.setLastCompletedProcess('newGame');
+      // eslint-disable-next-line no-use-before-define
+      gameDirector.controlGame();
     } )
   },
 });
@@ -213,6 +230,18 @@ const moveSelectionApplicator = (state) => ({
   },
 });
 
+const lastCompletedProcessGetter = (state) => ({
+  getLastCompletedProcess: () => state.lastCompletedProcess,
+});
+
+const lastCompletedProcessSetter = (state) => ({
+  setLastCompletedProcess: (process) => {
+    if (state.lastCompletedProcess === null) {
+      state.lastCompletedProcess = process;
+    }
+  },
+});
+
 const gameDirector = (() => {
   const state = {
     name: "gameDirector",
@@ -222,14 +251,18 @@ const gameDirector = (() => {
     player2Symbol: "O",
     lastCompletedProcess: null,
   };
+
   return {
     
+    ...gameController(state),
     ...nameGetter(state),
     ...domSquareClearer(state),
     ...domAssigner(state),
     ...playerNotifier(state),
     ...moveSelectionApplicator(state),
-    ...winChecker(winSets.state)
+    ...winChecker(winSets.state),
+    ...lastCompletedProcessGetter(state),
+    ...lastCompletedProcessSetter(state),
   };
 })();
 

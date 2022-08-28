@@ -87,11 +87,11 @@ const gameboard = (() => {
 
 const winSetChecker = () => ({
   checkWinSet: (winSet) => {
-    const winText = document.querySelector('#winText');
+    const notificationText = document.querySelector('#notificationText');
     if (winSet.countMarks("X") === 3) {
-      winText.textContent = "X WINS";
+      notificationText.textContent = "X WINS";
     } else if (winSet.countMarks("O") === 3) {
-      winText.textContent = "O WINS";
+      notificationText.textContent = "O WINS";
     }
   },
 });
@@ -196,7 +196,8 @@ const domAssigner = () => ({
 
 const playerNotifier = (state) => ({
   notifyCurrentPlayer: () => {
-    console.log(`${state.currentPlayerTurn}, it is your turn!`);
+    const notificationText = document.querySelector('#notificationText');
+    notificationText.textContent = `${state.currentPlayerTurn}, it is your turn!`;
   },
 });
 

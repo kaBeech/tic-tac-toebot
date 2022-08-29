@@ -27,11 +27,10 @@ const Square = (name, position) => {
     mark: null,
   };
   return {
-    
     ...nameGetter(state),
     ...markGetter(state),
     ...markSetter(state),
-    ...positionGetter(state)
+    ...positionGetter(state),
   };
 };
 
@@ -93,17 +92,16 @@ const gameboard = (() => {
   };
 
   return {
-    
     ...nameGetter(state),
     ...arrayGetter(state),
     ...gameSquareIDsGetter(state),
-    ...markCounter(state)
+    ...markCounter(state),
   };
 })();
 
 const winSetChecker = () => ({
   checkWinSet: (winSet) => {
-    const notificationText = document.querySelector('#notificationText');
+    const notificationText = document.querySelector("#notificationText");
     if (winSet.countMarks("X") === 3) {
       notificationText.textContent = "X WINS";
     } else if (winSet.countMarks("O") === 3) {
@@ -117,10 +115,9 @@ const WinSet = (set) => {
     array: set,
   };
   return {
-    
     ...arrayGetter(state),
     ...winSetChecker(state),
-    ...markCounter(state)
+    ...markCounter(state),
   };
 };
 
@@ -152,7 +149,7 @@ const winSets = (() => {
     const state = {
       array: set,
     };
-    return { ...arrayGetter(state)};
+    return { ...arrayGetter(state) };
   };
 
   const rowsAndColumns = WinSetGroup([
@@ -180,34 +177,33 @@ const winSets = (() => {
   };
 
   return {
-    
     ...arrayGetter(state),
     ...subArrayGetter(state),
-    ...winChecker(state)
+    ...winChecker(state),
   };
 })();
 
 const gameController = (state) => ({
   controlGame: (process) => {
     gameDirector.setCurrentProcess(process);
-    switch(state.currentProcess) {
-      case 'newGame':
+    switch (state.currentProcess) {
+      case "newGame":
         gameDirector.clearSquares();
-        gameDirector.setCurrentProcess('playerTurn');
+        gameDirector.setCurrentProcess("playerTurn");
         gameDirector.controlGame();
         break;
-      case 'playerTurn':
+      case "playerTurn":
         gameDirector.notifyCurrentPlayer();
-        gameDirector.setCurrentProcess('awaitMoveSelection');
+        gameDirector.setCurrentProcess("awaitMoveSelection");
         break;
-      case 'receiveMoveSelection':
+      case "receiveMoveSelection":
         winSets.checkWin();
-        break;  
+        break;
       default:
         gameDirector.setCurrentProcess(null);
         break;
     }
-  }
+  },
 });
 
 const domSquareClearer = () => ({
@@ -230,30 +226,29 @@ const domAssigner = () => ({
         // eslint-disable-next-line no-use-before-define
         gameDirector.applyMoveSelection(domSquare.id);
         // eslint-disable-next-line no-use-before-define
-        gameDirector.controlGame('receiveMoveSelection');
+        gameDirector.controlGame("receiveMoveSelection");
       });
     }
     newGameButton.addEventListener("click", () => {
       // eslint-disable-next-line no-use-before-define
-      gameDirector.controlGame('newGame');
-    } )
+      gameDirector.controlGame("newGame");
+    });
   },
 });
 
 const playerNotifier = (state) => ({
   notifyCurrentPlayer: () => {
-    const notificationText = document.querySelector('#notificationText');
+    const notificationText = document.querySelector("#notificationText");
     notificationText.textContent = `${state.currentPlayerTurn}, it is your turn!`;
   },
 });
 
 const moveSelectionApplicator = (state) => ({
   applyMoveSelection: (domSquareID) => {
-    const domSquare = document.querySelector(`#${  domSquareID}`);
+    const domSquare = document.querySelector(`#${domSquareID}`);
     domSquare.textContent = state.currentSymbol;
     const gameboardSquare = gameboard.getGameSquareIDs().indexOf(domSquareID);
     gameboard.getArray()[gameboardSquare].setMark(state.currentSymbol);
-
   },
 });
 
@@ -278,7 +273,6 @@ const gameDirector = (() => {
   };
 
   return {
-    
     ...gameController(state),
     ...nameGetter(state),
     ...domSquareClearer(state),
@@ -394,11 +388,10 @@ const ai = (() => {
     opponentSymbol: "O",
   };
   return {
-    
     ...possibleMoveUpdater(state),
     ...possibleMoveGetter(state),
     ...moveMaker(state),
-    ...skillSetter(state)
+    ...skillSetter(state),
   };
 })();
 
@@ -413,10 +406,11 @@ const rainbowShifter = (state) => ({
 });
 
 const colorUpdater = (state) => ({
-  updateColor: () =>
-    {(document.querySelector(
+  updateColor: () => {
+    document.querySelector(
       "body"
-    ).style.color = `hsl(${state.rainbowHue}, 100%, 80%)`)},
+    ).style.color = `hsl(${state.rainbowHue}, 100%, 80%)`;
+  },
 });
 
 const colorController = (() => {
@@ -424,7 +418,7 @@ const colorController = (() => {
     rainbowHue: Math.floor(Math.random() * 360),
     body: document.querySelector("body"),
   };
-  return { ...rainbowShifter(state), ...colorUpdater(state)};
+  return { ...rainbowShifter(state), ...colorUpdater(state) };
 })();
 
 setInterval(colorController.shiftRainbow, 250);

@@ -50,8 +50,8 @@ const Player = (name, symbol, species) => {
     ...nameGetter(state),
     ...symbolGetter(state),
     ...speciesGetter(state),
-  }
-}
+  };
+};
 
 const squaresArrayGetter = (state) => ({
   getSquaresArray: () => state.squaresArray,
@@ -232,6 +232,10 @@ const newGameStarter = () => ({
     gameDirector.clearGameboardSquares();
     gameDirector.clearDOMSquares();
     gameDirector.setWinner(null);
+    const player1 = Player("Player 1", "X", "computer")
+    const player2 = Player("Player 2", "O", "human")
+    gameDirector.setPlayer1(player1);
+    gameDirector.setPlayer2(player2);
     gameDirector.notifyCurrentPlayer();
   },
 });
@@ -271,6 +275,26 @@ const domAssigner = () => ({
       // eslint-disable-next-line no-use-before-define
       gameDirector.startNewGame();
     });
+  },
+});
+
+const player1Getter = (state) => ({
+  getPlayer1: () => state.player1,
+});
+
+const winnerSetter = (state) => ({
+  setPlayer1: (player1) => {
+    state.player1 = player1;
+  },
+});
+
+const player2Getter = (state) => ({
+  getPlayer2: () => state.player2,
+});
+
+const winnerSetter = (state) => ({
+  setPlayer2: (player2) => {
+    state.player2 = player2;
   },
 });
 
@@ -356,6 +380,9 @@ const winnerSetter = (state) => ({
 const gameDirector = (() => {
   const state = {
     name: "gameDirector",
+    player1: null,
+    player2: null,
+    currentPlayer: player2,
     currentPlayerTurn: "player2",
     currentSymbol: "O",
     player1Symbol: "X",
@@ -364,6 +391,16 @@ const gameDirector = (() => {
     winner: null,
     waiting: false,
   };
+
+  // const state = {
+  //   name: "gameDirector",
+  //   player1: null,
+  //   player2: null,
+  //   currentPlayer: player2,
+  //   currentProcess: null,
+  //   winner: null,
+  //   waiting: false,
+  // };
 
   return {
     ...newGameStarter(state),

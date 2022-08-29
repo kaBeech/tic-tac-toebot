@@ -127,10 +127,13 @@ const subArrayGetter = (state) => ({
   getSubArray: () => state.subArrays,
 });
 
-const winChecker = (state) => ({
+const winChecker = () => ({
   checkWin: () => {
-    for (const winSet of state.array) {
+    for (const winSet of winSets.getArray()) {
       winSet.checkWinSet(winSet);
+    }
+    if (gameDirector.getWinner() === null) {
+      gameDirector.incrementTurn();
     }
   },
 });
@@ -185,31 +188,10 @@ const winSets = (() => {
   };
 })();
 
-const gameController = (state) => ({
-  controlGame: (process) => {
-    gameDirector.setCurrentProcess(process);
-    switch (state.currentProcess) {
-      case "newGame":
-        gameDirector.clearSquares();
-        gameDirector.controlGame("playerTurn");
-        break;
-      case "playerTurn":
-        gameDirector.notifyCurrentPlayer();
-        gameDirector.setCurrentProcess("awaitMoveSelection");
-        break;
-      case "receiveMoveSelection":
-        winSets.checkWin();
-        if (gameDirector.getWinner() === null) {
-          gameDirector.incrementTurn();
-          gameDirector.controlGame("playerTurn");
-        } else {
-          gameDirector.setCurrentProcess(null);
-        }
-        break;
-      default:
-        gameDirector.setCurrentProcess(null);
-        break;
-    }
+const newGameStarter = () => ({
+  startNewGame: () => {
+    gameDirector.clearSquares();
+    gameDirector.notifyCurrentPlayer();
   },
 });
 
@@ -231,14 +213,12 @@ const domAssigner = () => ({
     for (const domSquare of domSquares) {
       domSquare.addEventListener("click", () => {
         // eslint-disable-next-line no-use-before-define
-        gameDirector.applyMoveSelection(domSquare.id);
-        // eslint-disable-next-line no-use-before-define
-        gameDirector.controlGame("receiveMoveSelection");
+        gameDirector.handleMoveSelection(domSquare.id);
       });
     }
     newGameButton.addEventListener("click", () => {
       // eslint-disable-next-line no-use-before-define
-      gameDirector.controlGame("newGame");
+      gameDirector.startNewGame();
     });
   },
 });
@@ -247,15 +227,42 @@ const playerNotifier = (state) => ({
   notifyCurrentPlayer: () => {
     const notificationText = document.querySelector("#notificationText");
     notificationText.textContent = `${state.currentPlayerTurn}, it is your turn!`;
+    gameDirector.setWaitingStatus(true);
+  },
+});
+
+const waitingStatusGetter = (state) => ({
+  getWaitingStatus: () => state.waitingStatus,
+});
+
+const waitingStatusSetter = (state) => ({
+  setWaitingStatus: (waitingStatus) => {
+    state.waitingStatus = waitingStatus;
+  },
+});
+
+const moveSelectionHandler = () => ({
+  handleMoveSelection: (moveSelection) => {
+    const gameboardSquareIndex = gameboard
+      .getGameSquareIDs()
+      .indexOf(moveSelection);
+    const gameboardSquare = gameboard.getArray()[gameboardSquareIndex];
+    if (
+      gameDirector.getWaitingStatus() === true &&
+      gameboardSquare.getMark() === null
+    ) {
+      gameDirector.setWaitingStatus(false);
+      gameDirector.applyMoveSelection(moveSelection, gameboardSquare);
+    }
   },
 });
 
 const moveSelectionApplicator = (state) => ({
-  applyMoveSelection: (domSquareID) => {
-    const domSquare = document.querySelector(`#${domSquareID}`);
+  applyMoveSelection: (moveSelection, gameboardSquare) => {
+    const domSquare = document.querySelector(`#${moveSelection}`);
     domSquare.textContent = state.currentSymbol;
-    const gameboardSquare = gameboard.getGameSquareIDs().indexOf(domSquareID);
-    gameboard.getArray()[gameboardSquare].setMark(state.currentSymbol);
+    gameboardSquare.setMark(state.currentSymbol);
+    gameDirector.checkWin();
   },
 });
 
@@ -271,16 +278,17 @@ const currentProcessSetter = (state) => ({
 
 const turnIncrementer = (state) => ({
   incrementTurn: () => {
-    if (state.currentPlayerTurn === 'player1') {
+    if (state.currentPlayerTurn === "player1") {
       state.currentPlayerTurn = "player2";
-    } else if (state.currentPlayerTurn === 'player2') {
+    } else if (state.currentPlayerTurn === "player2") {
       state.currentPlayerTurn = "player1";
-    };
-    if (state.currentSymbol === 'X') {
+    }
+    if (state.currentSymbol === "X") {
       state.currentSymbol = "O";
-    } else if (state.currentSymbol === 'O') {
+    } else if (state.currentSymbol === "O") {
       state.currentSymbol = "X";
-    };
+    }
+    gameDirector.notifyCurrentPlayer();
   },
 });
 
@@ -303,14 +311,18 @@ const gameDirector = (() => {
     player2Symbol: "O",
     currentProcess: null,
     winner: null,
+    waiting: false,
   };
 
   return {
-    ...gameController(state),
+    ...newGameStarter(state),
+    ...waitingStatusGetter(state),
+    ...waitingStatusSetter(state),
     ...nameGetter(state),
     ...domSquareClearer(state),
     ...domAssigner(state),
     ...playerNotifier(state),
+    ...moveSelectionHandler(state),
     ...moveSelectionApplicator(state),
     ...winChecker(winSets.state),
     ...currentProcessGetter(state),
@@ -461,11 +473,3 @@ setInterval(colorController.shiftRainbow, 250);
 setInterval(colorController.updateColor, 250);
 
 gameDirector.assignSquares();
-
-// gameDirector flow:
-// 1) Initialize Board or increment currentPlayerTurn : gamedirector.assignSquares()
-// 2) Notify Player of Turn gameDirector.notifyCurrentPlayer()
-// 3) Process Player's turn selection : gamedirector.applyMoveSelection()
-// 4) Check if the player has won. If they have, celebrate! : gamedirector.checkWin()
-//
-//

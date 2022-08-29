@@ -32,8 +32,29 @@ const Square = (name, position) => {
   };
 };
 
-const arrayGetter = (state) => ({
-  getArray: () => state.array,
+const symbolGetter = (state) => ({
+  getSymbol: () => state.symbol,
+});
+
+const speciesGetter = (state) => ({
+  getSpecies: () => state.species,
+});
+
+const Player = (name, symbol, species) => {
+  const state = {
+    name,
+    symbol,
+    species,
+  };
+  return {
+    ...nameGetter(state),
+    ...symbolGetter(state),
+    ...speciesGetter(state),
+  }
+}
+
+const gameSquaresGetter = (state) => ({
+  getArray: () => state.gameSquares,
 });
 
 const gameSquareIDsGetter = (state) => ({
@@ -44,14 +65,14 @@ const markCounter = (state) => ({
   countMarks: (symbol) => {
     let marks = 0;
     if (symbol === "all") {
-      for (const square of state.array) {
+      for (const square of state.gameSquares) {
         if (square.getMark() !== null) {
           marks += 1;
         }
       }
       return marks;
     }
-    for (const square of state.array) {
+    for (const square of state.gameSquares) {
       if (square.getMark() === symbol) {
         marks += 1;
       }
@@ -73,7 +94,7 @@ const gameboard = (() => {
 
   const state = {
     name: "gameboard",
-    array: [
+    gameSquares: [
       topLeft,
       topCenter,
       topRight,
@@ -99,7 +120,7 @@ const gameboard = (() => {
 
   return {
     ...nameGetter(state),
-    ...arrayGetter(state),
+    ...gameSquaresGetter(state),
     ...gameSquareIDsGetter(state),
     ...markCounter(state),
   };
@@ -123,10 +144,10 @@ const winSetChecker = () => ({
 
 const WinSet = (set) => {
   const state = {
-    array: set,
+    gameSquares: set,
   };
   return {
-    ...arrayGetter(state),
+    ...gameSquaresGetter(state),
     ...winSetChecker(state),
     ...markCounter(state),
   };
@@ -166,9 +187,9 @@ const winSets = (() => {
 
   const WinSetGroup = (set) => {
     const state = {
-      array: set,
+      gameSquares: set,
     };
-    return { ...arrayGetter(state) };
+    return { ...gameSquaresGetter(state) };
   };
 
   const rowsAndColumns = WinSetGroup([
@@ -183,7 +204,7 @@ const winSets = (() => {
 
   const state = {
     subArrays: [rowsAndColumns, diagonals],
-    array: [
+    gameSquares: [
       topRow,
       midRow,
       bottomRow,
@@ -196,7 +217,7 @@ const winSets = (() => {
   };
 
   return {
-    ...arrayGetter(state),
+    ...gameSquaresGetter(state),
     ...subArrayGetter(state),
     ...winChecker(state),
   };

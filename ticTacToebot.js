@@ -10,9 +10,7 @@ const markGetter = (state) => ({
 
 const markSetter = (state) => ({
   setMark: (symbol) => {
-    if (state.mark === null) {
-      state.mark = symbol;
-    }
+    state.mark = symbol;
   },
 });
 
@@ -206,13 +204,24 @@ const winSets = (() => {
 
 const newGameStarter = () => ({
   startNewGame: () => {
-    gameDirector.clearSquares();
+    gameDirector.clearGameboardSquares();
+    gameDirector.clearDOMSquares();
     gameDirector.notifyCurrentPlayer();
   },
 });
 
+const gameboardSquareClearer = () => ({
+  clearGameboardSquares: () => {
+    const gameboardSquares = gameboard.getArray();
+
+    for (const gameboardSquare of gameboardSquares) {
+      gameboardSquare.setMark(null);
+    }
+  },
+});
+
 const domSquareClearer = () => ({
-  clearSquares: () => {
+  clearDOMSquares: () => {
     const domSquares = document.querySelectorAll(".gameSquare");
 
     for (const domSquare of domSquares) {
@@ -335,6 +344,7 @@ const gameDirector = (() => {
     ...waitingStatusGetter(state),
     ...waitingStatusSetter(state),
     ...nameGetter(state),
+    ...gameboardSquareClearer(state),
     ...domSquareClearer(state),
     ...domAssigner(state),
     ...playerNotifier(state),

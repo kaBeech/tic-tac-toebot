@@ -39,6 +39,10 @@ const arrayGetter = (state) => ({
   getArray: () => state.array,
 });
 
+const gameSquareIDsGetter = (state) => ({
+  getGameSquareIDs: () => state.gameSquareIDs,
+});
+
 const markCounter = (state) => ({
   countMarks: (symbol) => {
     let marks = 0;
@@ -75,12 +79,24 @@ const gameboard = (() => {
       bottomCenter,
       bottomRight,
     ],
+    gameSquareIDs: [
+      "topLeft",
+      "topCenter",
+      "topRight",
+      "midLeft",
+      "midCenter",
+      "midRight",
+      "bottomLeft",
+      "bottomCenter",
+      "bottomRight",
+    ],
   };
 
   return {
     
     ...nameGetter(state),
     ...arrayGetter(state),
+    ...gameSquareIDsGetter(state),
     ...markCounter(state)
   };
 })();
@@ -172,12 +188,23 @@ const winSets = (() => {
 })();
 
 const gameController = (state) => ({
-  controlGame: () => {
-    switch(state.lastCompletedProcess) {
+  controlGame: (process) => {
+    gameDirector.setCurrentProcess(process);
+    switch(state.currentProcess) {
       case 'newGame':
-        console.log('Success!')
+        gameDirector.clearSquares();
+        gameDirector.setCurrentProcess('playerTurn');
+        gameDirector.controlGame();
         break;
+      case 'playerTurn':
+        gameDirector.notifyCurrentPlayer();
+        gameDirector.setCurrentProcess('awaitMoveSelection');
+        break;
+      case 'receiveMoveSelection':
+        winSets.checkWin();
+        break;  
       default:
+        gameDirector.setCurrentProcess(null);
         break;
     }
   }
@@ -202,15 +229,13 @@ const domAssigner = () => ({
       domSquare.addEventListener("click", () => {
         // eslint-disable-next-line no-use-before-define
         gameDirector.applyMoveSelection(domSquare.id);
+        // eslint-disable-next-line no-use-before-define
+        gameDirector.controlGame('receiveMoveSelection');
       });
     }
     newGameButton.addEventListener("click", () => {
       // eslint-disable-next-line no-use-before-define
-      gameDirector.clearSquares();
-      // eslint-disable-next-line no-use-before-define
-      gameDirector.setLastCompletedProcess('newGame');
-      // eslint-disable-next-line no-use-before-define
-      gameDirector.controlGame();
+      gameDirector.controlGame('newGame');
     } )
   },
 });
@@ -224,21 +249,21 @@ const playerNotifier = (state) => ({
 
 const moveSelectionApplicator = (state) => ({
   applyMoveSelection: (domSquareID) => {
-    const selectedSquare = document.querySelector(`#${  domSquareID}`);
-    selectedSquare.textContent = state.currentSymbol;
-    // domSquareID.setMark(state.currentSymbol);
+    const domSquare = document.querySelector(`#${  domSquareID}`);
+    domSquare.textContent = state.currentSymbol;
+    const gameboardSquare = gameboard.getGameSquareIDs().indexOf(domSquareID);
+    gameboard.getArray()[gameboardSquare].setMark(state.currentSymbol);
+
   },
 });
 
-const lastCompletedProcessGetter = (state) => ({
-  getLastCompletedProcess: () => state.lastCompletedProcess,
+const currentProcessGetter = (state) => ({
+  getCurrentProcess: () => state.currentProcess,
 });
 
-const lastCompletedProcessSetter = (state) => ({
-  setLastCompletedProcess: (process) => {
-    if (state.lastCompletedProcess === null) {
-      state.lastCompletedProcess = process;
-    }
+const currentProcessSetter = (state) => ({
+  setCurrentProcess: (process) => {
+    state.currentProcess = process;
   },
 });
 
@@ -249,7 +274,7 @@ const gameDirector = (() => {
     currentSymbol: "O",
     player1Symbol: "X",
     player2Symbol: "O",
-    lastCompletedProcess: null,
+    currentProcess: null,
   };
 
   return {
@@ -261,8 +286,8 @@ const gameDirector = (() => {
     ...playerNotifier(state),
     ...moveSelectionApplicator(state),
     ...winChecker(winSets.state),
-    ...lastCompletedProcessGetter(state),
-    ...lastCompletedProcessSetter(state),
+    ...currentProcessGetter(state),
+    ...currentProcessSetter(state),
   };
 })();
 

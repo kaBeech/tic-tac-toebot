@@ -45,6 +45,14 @@ const gameSquareIDsGetter = (state) => ({
 const markCounter = (state) => ({
   countMarks: (symbol) => {
     let marks = 0;
+    if (symbol === "all") {
+      for (const square of state.array) {
+        if (square.getMark() !== null) {
+          marks += 1;
+        }
+      }
+      return marks;
+    }
     for (const square of state.array) {
       if (square.getMark() === symbol) {
         marks += 1;
@@ -108,6 +116,9 @@ const winSetChecker = () => ({
     } else if (winSet.countMarks("O") === 3) {
       notificationText.textContent = "O WINS";
       gameDirector.setWinner();
+    } else if (winSet.countMarks("O") === 3) {
+      notificationText.textContent = "O WINS";
+      gameDirector.setWinner();
     }
   },
 });
@@ -129,11 +140,16 @@ const subArrayGetter = (state) => ({
 
 const winChecker = () => ({
   checkWin: () => {
-    for (const winSet of winSets.getArray()) {
-      winSet.checkWinSet(winSet);
-    }
-    if (gameDirector.getWinner() === null) {
-      gameDirector.incrementTurn();
+    if (gameboard.countMarks("all") === 9) {
+      notificationText.textContent = "CAT'S GAME!";
+      gameDirector.setWinner("Draw");
+    } else {
+      for (const winSet of winSets.getArray()) {
+        winSet.checkWinSet(winSet);
+      }
+      if (gameDirector.getWinner() === null) {
+        gameDirector.incrementTurn();
+      }
     }
   },
 });

@@ -206,6 +206,7 @@ const newGameStarter = () => ({
   startNewGame: () => {
     gameDirector.clearGameboardSquares();
     gameDirector.clearDOMSquares();
+    gameDirector.setWinner(null);
     gameDirector.notifyCurrentPlayer();
   },
 });

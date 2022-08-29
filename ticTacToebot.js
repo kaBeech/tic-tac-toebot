@@ -235,10 +235,6 @@ const newGameStarter = () => ({
     gameDirector.clearGameboardSquares();
     gameDirector.clearDOMSquares();
     gameDirector.setWinner(null);
-    const player1 = Player("Player 1", "X", "computer")
-    const player2 = Player("Player 2", "O", "human")
-    gameDirector.setPlayer1(player1);
-    gameDirector.setPlayer2(player2);
     gameDirector.notifyCurrentPlayer();
   },
 });
@@ -278,26 +274,6 @@ const domAssigner = () => ({
       // eslint-disable-next-line no-use-before-define
       gameDirector.startNewGame();
     });
-  },
-});
-
-const player1Getter = (state) => ({
-  getPlayer1: () => state.player1,
-});
-
-const player1Setter = (state) => ({
-  setPlayer1: (player1) => {
-    state.player1 = player1;
-  },
-});
-
-const player2Getter = (state) => ({
-  getPlayer2: () => state.player2,
-});
-
-const player2Setter = (state) => ({
-  setPlayer2: (player2) => {
-    state.player2 = player2;
   },
 });
 
@@ -385,10 +361,7 @@ const gameDirector = (() => {
   };
 
   return {
-    ...player1Getter(state),
-    ...player1Setter(state),
-    ...player2Getter(state),
-    ...player2Setter(state),
+
     ...newGameStarter(state),
     ...waitingStatusGetter(state),
     ...waitingStatusSetter(state),
@@ -544,15 +517,12 @@ const colorController = (() => {
   return { ...rainbowShifter(state), ...colorUpdater(state) };
 })();
 
-// const pageController = (() => {
-//   const state = {
-
-//   }
-// })();
-
-
-
-setInterval(colorController.shiftRainbow, 250);
-setInterval(colorController.updateColor, 250);
-
-gameDirector.assignSquares();
+const pageInitializer = (() => {
+  const state = {
+    name: "pageInitializer"
+  };
+  setInterval(colorController.shiftRainbow, 250);
+  setInterval(colorController.updateColor, 250);
+  gameDirector.assignSquares();
+  return { ...nameGetter(state)}
+})();

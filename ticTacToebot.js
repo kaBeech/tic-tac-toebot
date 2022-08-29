@@ -104,8 +104,10 @@ const winSetChecker = () => ({
     const notificationText = document.querySelector("#notificationText");
     if (winSet.countMarks("X") === 3) {
       notificationText.textContent = "X WINS";
+      gameDirector.setWinner();
     } else if (winSet.countMarks("O") === 3) {
       notificationText.textContent = "O WINS";
+      gameDirector.setWinner();
     }
   },
 });
@@ -198,6 +200,12 @@ const gameController = (state) => ({
         break;
       case "receiveMoveSelection":
         winSets.checkWin();
+        if (gameDirector.getWinner() === null) {
+          gameDirector.incrementTurn();
+          gameDirector.controlGame("playerTurn");
+        } else {
+          gameDirector.setCurrentProcess(null);
+        }
         break;
       default:
         gameDirector.setCurrentProcess(null);
@@ -262,6 +270,16 @@ const currentProcessSetter = (state) => ({
   },
 });
 
+const winnerGetter = (state) => ({
+  getWinner: () => state.winner,
+});
+
+const winnerSetter = (state) => ({
+  setWinner: (winner) => {
+    state.winner = winner;
+  },
+});
+
 const gameDirector = (() => {
   const state = {
     name: "gameDirector",
@@ -270,6 +288,7 @@ const gameDirector = (() => {
     player1Symbol: "X",
     player2Symbol: "O",
     currentProcess: null,
+    winner: null,
   };
 
   return {
@@ -282,6 +301,8 @@ const gameDirector = (() => {
     ...winChecker(winSets.state),
     ...currentProcessGetter(state),
     ...currentProcessSetter(state),
+    ...winnerGetter(state),
+    ...winnerSetter(state),
   };
 })();
 

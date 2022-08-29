@@ -269,7 +269,7 @@ const domAssigner = () => ({
     for (const domSquare of domSquares) {
       domSquare.addEventListener("click", () => {
         // eslint-disable-next-line no-use-before-define
-        gameDirector.handleMoveSelection(domSquare.id);
+        human.selectHumanMove(domSquare.id);
       });
     }
     newGameButton.addEventListener("click", () => {
@@ -428,8 +428,6 @@ const moveSelector = (state) => {
     }
   };
   const selectCrucialMove = (winset) => {
-    console.log(winset.getSquaresArray());
-    console.log(winset.getSquaresArray()[1].getName());
     for (const square of winset.getSquaresArray()) {
       if (square.getMark() === null) {
         return think(square.getName());
@@ -510,6 +508,23 @@ const ai = (() => {
     ...possibleMoveGetter(state),
     ...moveSelector(state),
     ...skillSetter(state),
+  };
+})();
+
+const humanMoveSelector = (state) => ({
+  selectHumanMove: (moveSelection) => {
+    if (gameDirector.getCurrentPlayer().getSpecies() === "human") {
+      gameDirector.handleMoveSelection(moveSelection);
+    }
+  },
+});
+
+const human = (() => {
+  const state = {
+    species: "human",
+  };
+  return {
+    ...humanMoveSelector(state),
   };
 })();
 

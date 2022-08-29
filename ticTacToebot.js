@@ -191,8 +191,7 @@ const gameController = (state) => ({
     switch (state.currentProcess) {
       case "newGame":
         gameDirector.clearSquares();
-        gameDirector.setCurrentProcess("playerTurn");
-        gameDirector.controlGame();
+        gameDirector.controlGame("playerTurn");
         break;
       case "playerTurn":
         gameDirector.notifyCurrentPlayer();
@@ -270,6 +269,21 @@ const currentProcessSetter = (state) => ({
   },
 });
 
+const turnIncrementer = (state) => ({
+  incrementTurn: () => {
+    if (state.currentPlayerTurn === 'player1') {
+      state.currentPlayerTurn = "player2";
+    } else if (state.currentPlayerTurn === 'player2') {
+      state.currentPlayerTurn = "player1";
+    };
+    if (state.currentSymbol === 'X') {
+      state.currentSymbol = "O";
+    } else if (state.currentSymbol === 'O') {
+      state.currentSymbol = "X";
+    };
+  },
+});
+
 const winnerGetter = (state) => ({
   getWinner: () => state.winner,
 });
@@ -301,6 +315,7 @@ const gameDirector = (() => {
     ...winChecker(winSets.state),
     ...currentProcessGetter(state),
     ...currentProcessSetter(state),
+    ...turnIncrementer(state),
     ...winnerGetter(state),
     ...winnerSetter(state),
   };

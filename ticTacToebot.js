@@ -4,6 +4,30 @@ const nameGetter = (state) => ({
   getName: () => state.name,
 });
 
+const symbolGetter = (state) => ({
+  getSymbol: () => state.symbol,
+});
+
+const speciesGetter = (state) => ({
+  getSpecies: () => state.species,
+});
+
+const Player = (name, symbol, species) => {
+  const state = {
+    name,
+    symbol,
+    species,
+  };
+  return {
+    ...nameGetter(state),
+    ...symbolGetter(state),
+    ...speciesGetter(state),
+  };
+};
+
+const player1 = Player("Player 1", "X", "computer");
+const player2 = Player("Player 2", "O", "human");
+
 const markGetter = (state) => ({
   getMark: () => state.mark,
 });
@@ -29,27 +53,6 @@ const Square = (name, position) => {
     ...markGetter(state),
     ...markSetter(state),
     ...positionGetter(state),
-  };
-};
-
-const symbolGetter = (state) => ({
-  getSymbol: () => state.symbol,
-});
-
-const speciesGetter = (state) => ({
-  getSpecies: () => state.species,
-});
-
-const Player = (name, symbol, species) => {
-  const state = {
-    name,
-    symbol,
-    species,
-  };
-  return {
-    ...nameGetter(state),
-    ...symbolGetter(state),
-    ...speciesGetter(state),
   };
 };
 
@@ -282,7 +285,7 @@ const player1Getter = (state) => ({
   getPlayer1: () => state.player1,
 });
 
-const winnerSetter = (state) => ({
+const player1Setter = (state) => ({
   setPlayer1: (player1) => {
     state.player1 = player1;
   },
@@ -292,7 +295,7 @@ const player2Getter = (state) => ({
   getPlayer2: () => state.player2,
 });
 
-const winnerSetter = (state) => ({
+const player2Setter = (state) => ({
   setPlayer2: (player2) => {
     state.player2 = player2;
   },
@@ -301,7 +304,7 @@ const winnerSetter = (state) => ({
 const playerNotifier = (state) => ({
   notifyCurrentPlayer: () => {
     const notificationText = document.querySelector("#notificationText");
-    notificationText.textContent = `${state.currentPlayerTurn}, it is your turn!`;
+    notificationText.textContent = `${state.currentPlayer.getName()}, itis your turn!`;
     gameDirector.setWaitingStatus(true);
   },
 });
@@ -335,8 +338,8 @@ const moveSelectionHandler = () => ({
 const moveSelectionApplicator = (state) => ({
   applyMoveSelection: (moveSelection, gameboardSquare) => {
     const domSquare = document.querySelector(`#${moveSelection}`);
-    domSquare.textContent = state.currentSymbol;
-    gameboardSquare.setMark(state.currentSymbol);
+    domSquare.textContent = state.currentPlayer.getSymbol();
+    gameboardSquare.setMark(state.currentPlayer.getSymbol());
     gameDirector.checkWin();
   },
 });
@@ -353,15 +356,10 @@ const currentProcessSetter = (state) => ({
 
 const turnIncrementer = (state) => ({
   incrementTurn: () => {
-    if (state.currentPlayerTurn === "player1") {
-      state.currentPlayerTurn = "player2";
-    } else if (state.currentPlayerTurn === "player2") {
-      state.currentPlayerTurn = "player1";
-    }
-    if (state.currentSymbol === "X") {
-      state.currentSymbol = "O";
-    } else if (state.currentSymbol === "O") {
-      state.currentSymbol = "X";
+    if (state.currentPlayer === player1) {
+      state.currentPlayer = player2;
+    } else if (state.currentPlayer === player2) {
+      state.currentPlayer = player1;
     }
     gameDirector.notifyCurrentPlayer();
   },
@@ -380,29 +378,17 @@ const winnerSetter = (state) => ({
 const gameDirector = (() => {
   const state = {
     name: "gameDirector",
-    player1: null,
-    player2: null,
     currentPlayer: player2,
-    currentPlayerTurn: "player2",
-    currentSymbol: "O",
-    player1Symbol: "X",
-    player2Symbol: "O",
     currentProcess: null,
     winner: null,
-    waiting: false,
+    waitingStatus: false,
   };
 
-  // const state = {
-  //   name: "gameDirector",
-  //   player1: null,
-  //   player2: null,
-  //   currentPlayer: player2,
-  //   currentProcess: null,
-  //   winner: null,
-  //   waiting: false,
-  // };
-
   return {
+    ...player1Getter(state),
+    ...player1Setter(state),
+    ...player2Getter(state),
+    ...player2Setter(state),
     ...newGameStarter(state),
     ...waitingStatusGetter(state),
     ...waitingStatusSetter(state),
@@ -557,6 +543,14 @@ const colorController = (() => {
   };
   return { ...rainbowShifter(state), ...colorUpdater(state) };
 })();
+
+// const pageController = (() => {
+//   const state = {
+
+//   }
+// })();
+
+
 
 setInterval(colorController.shiftRainbow, 250);
 setInterval(colorController.updateColor, 250);

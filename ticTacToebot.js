@@ -166,16 +166,18 @@ const winSupersetArrayGetter = (state) => ({
 
 const winChecker = () => ({
   checkWin: () => {
-    if (gameboard.countMarks("all") === 9) {
+    for (const winset of winsets.getWinsetsArray()) {
+      winset.checkWinset(winset);
+    }
+    if (
+      gameDirector.getWinner() === null &&
+      gameboard.countMarks("all") === 9
+    ) {
       notificationText.textContent = "CAT'S GAME!";
       gameDirector.setWinner("Draw");
-    } else {
-      for (const winset of winsets.getWinsetsArray()) {
-        winset.checkWinset(winset);
-      }
-      if (gameDirector.getWinner() === null) {
-        gameDirector.incrementTurn();
-      }
+    }
+    if (gameDirector.getWinner() === null) {
+      gameDirector.incrementTurn();
     }
   },
 });
@@ -280,8 +282,11 @@ const domAssigner = () => ({
 const playerNotifier = (state) => ({
   notifyCurrentPlayer: () => {
     const notificationText = document.querySelector("#notificationText");
-    notificationText.textContent = `${state.currentPlayer.getName()}, itis your turn!`;
+    notificationText.textContent = `${state.currentPlayer.getName()}, it is your turn!`;
     gameDirector.setWaitingStatus(true);
+    if (state.currentPlayer.getSpecies() === "computer") {
+      ai.selectMove();
+    }
   },
 });
 
@@ -320,6 +325,16 @@ const moveSelectionApplicator = (state) => ({
   },
 });
 
+const currentPlayerGetter = (state) => ({
+  getCurrentPlayer: () => state.currentPlayer,
+});
+
+const currentPlayerSetter = (state) => ({
+  setCurrentPlayer: (currentPlayer) => {
+    state.currentPlayer = currentPlayer;
+  },
+});
+
 const currentProcessGetter = (state) => ({
   getCurrentProcess: () => state.currentProcess,
 });
@@ -354,18 +369,19 @@ const winnerSetter = (state) => ({
 const gameDirector = (() => {
   const state = {
     name: "gameDirector",
-    currentPlayer: player2,
+    currentPlayer: player1,
     currentProcess: null,
     winner: null,
     waitingStatus: false,
   };
 
   return {
-
     ...newGameStarter(state),
     ...waitingStatusGetter(state),
     ...waitingStatusSetter(state),
     ...nameGetter(state),
+    ...currentPlayerSetter(state),
+    ...currentPlayerGetter(state),
     ...gameboardSquareClearer(state),
     ...domSquareClearer(state),
     ...domAssigner(state),
@@ -395,32 +411,41 @@ const possibleMoveGetter = (state) => ({
   getPossibleMoves: () => state.possibleMoves,
 });
 
-const moveMaker = (state) => {
+const moveSelector = (state) => {
   const squares = gameboard.getSquaresArray();
-  const makeAnyMove = () => {
+  const think = (moveSelection) => {
+    const notificationText = document.querySelector("#notificationText");
+    notificationText.textContent = `${gameDirector
+      .getCurrentPlayer()
+      .getName()} is thinking...`;
+    setTimeout(gameDirector.handleMoveSelection, 1000, moveSelection);
+  };
+  const selectAnyMove = () => {
     for (const square of squares) {
-      if (square.getMark === null) {
-        square.setMark(state.symbol);
-        winsets.checkWin();
+      if (square.getMark() === null) {
+        return think(square.getName);
       }
     }
   };
-  const makeCrucialMove = () => {
+  const selectCrucialMove = (winset) => {
+    console.log(winset.getSquaresArray());
+    console.log(winset.getSquaresArray()[1].getName());
     for (const square of winset.getSquaresArray()) {
-      square.setMark(state.symbol);
+      if (square.getMark() === null) {
+        return think(square.getName());
+      }
     }
-    winsets.checkWin();
   };
-  const makeMove = () => {
+  const selectMove = () => {
     if (state.skill < Math.floor(Math.random() * 10)) {
-      return makeAnyMove();
+      return selectAnyMove();
     }
     for (const winset of winsets.getWinsetsArray()) {
       if (
         winset.countMarks(state.symbol) === 2 &&
         winset.countMarks(state.opponentSymbol) === 0
       ) {
-        return makeCrucialMove();
+        return selectCrucialMove(winset);
       }
     }
     for (const winset of winsets.getWinsetsArray()) {
@@ -428,7 +453,7 @@ const moveMaker = (state) => {
         winset.countMarks(state.symbol) === 0 &&
         winset.countMarks(state.opponentSymbol) === 2
       ) {
-        return makeCrucialMove();
+        return selectCrucialMove(winset);
       }
     }
     for (const winset of winsets.getWinSupersetArray()[0].getWinsetsArray()) {
@@ -438,8 +463,7 @@ const moveMaker = (state) => {
       ) {
         for (const square of winset.getSquaresArray()) {
           if (square.getMark() === null && square.getPosition() === "corner") {
-            square.setMark(state.symbol);
-            return winsets.checkWin();
+            return think(square.getName());
           }
         }
       }
@@ -453,21 +477,19 @@ const moveMaker = (state) => {
           square.getMark() === state.opponentSymbol &&
           square.getPosition() === "corner"
         ) {
-          squares[4].setMark(state.symbol);
-          return winsets.checkWin();
+          return think(squares[4].getName());
         }
       }
     }
     for (const square of squares) {
       if (square.getPosition() === "corner" && square.getMark() === null) {
-        square.setMark(state.symbol);
-        return winsets.checkWin();
+        return think(square.getName());
       }
     }
-    return makeAnyMove();
+    return selectAnyMove();
   };
 
-  return { makeMove };
+  return { selectMove };
 };
 
 const skillSetter = (state) => ({
@@ -486,7 +508,7 @@ const ai = (() => {
   return {
     ...possibleMoveUpdater(state),
     ...possibleMoveGetter(state),
-    ...moveMaker(state),
+    ...moveSelector(state),
     ...skillSetter(state),
   };
 })();
@@ -519,10 +541,10 @@ const colorController = (() => {
 
 const pageInitializer = (() => {
   const state = {
-    name: "pageInitializer"
+    name: "pageInitializer",
   };
   setInterval(colorController.shiftRainbow, 250);
   setInterval(colorController.updateColor, 250);
   gameDirector.assignSquares();
-  return { ...nameGetter(state)}
+  return { ...nameGetter(state) };
 })();

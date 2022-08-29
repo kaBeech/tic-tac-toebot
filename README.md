@@ -53,9 +53,9 @@ Use counters to tally up total numbers of marks in groups. For example,
 the inner square would +1 to the middle, center, X, Y, and inner counters.
 The center left squre would +1 to the center, left, and side counters.
 
-Give AI a 'memory bank' of rows, columns, and diagonals (winSets) that can still be
+Give AI a 'memory bank' of rows, columns, and diagonals (winsets) that can still be
 used for a winning play. IE it would start out as [T, M, B, L, C, R, X, Y].
-As human player marks squares, remove those winSets
+As human player marks squares, remove those winsets
 from the AI 'memory bank.'
 
 AI SKILL LEVELS: Random Picker, Distracted Doodler, Aloof Android (Minimax), 

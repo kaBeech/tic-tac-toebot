@@ -53,8 +53,12 @@ const Player = (name, symbol, species) => {
   }
 }
 
-const gameSquaresGetter = (state) => ({
-  getArray: () => state.gameSquares,
+const squaresArrayGetter = (state) => ({
+  getSquaresArray: () => state.squaresArray,
+});
+
+const winsetsArrayGetter = (state) => ({
+  getWinsetsArray: () => state.winsetsArray,
 });
 
 const gameSquareIDsGetter = (state) => ({
@@ -65,14 +69,14 @@ const markCounter = (state) => ({
   countMarks: (symbol) => {
     let marks = 0;
     if (symbol === "all") {
-      for (const square of state.gameSquares) {
+      for (const square of state.squaresArray) {
         if (square.getMark() !== null) {
           marks += 1;
         }
       }
       return marks;
     }
-    for (const square of state.gameSquares) {
+    for (const square of state.squaresArray) {
       if (square.getMark() === symbol) {
         marks += 1;
       }
@@ -94,7 +98,7 @@ const gameboard = (() => {
 
   const state = {
     name: "gameboard",
-    gameSquares: [
+    squaresArray: [
       topLeft,
       topCenter,
       topRight,
@@ -120,41 +124,41 @@ const gameboard = (() => {
 
   return {
     ...nameGetter(state),
-    ...gameSquaresGetter(state),
+    ...squaresArrayGetter(state),
     ...gameSquareIDsGetter(state),
     ...markCounter(state),
   };
 })();
 
-const winSetChecker = () => ({
-  checkWinSet: (winSet) => {
+const winsetChecker = () => ({
+  checkWinset: (winset) => {
     const notificationText = document.querySelector("#notificationText");
-    if (winSet.countMarks("X") === 3) {
+    if (winset.countMarks("X") === 3) {
       notificationText.textContent = "X WINS";
       gameDirector.setWinner();
-    } else if (winSet.countMarks("O") === 3) {
+    } else if (winset.countMarks("O") === 3) {
       notificationText.textContent = "O WINS";
       gameDirector.setWinner();
-    } else if (winSet.countMarks("O") === 3) {
+    } else if (winset.countMarks("O") === 3) {
       notificationText.textContent = "O WINS";
       gameDirector.setWinner();
     }
   },
 });
 
-const WinSet = (set) => {
+const Winset = (set) => {
   const state = {
-    gameSquares: set,
+    squaresArray: set,
   };
   return {
-    ...gameSquaresGetter(state),
-    ...winSetChecker(state),
+    ...squaresArrayGetter(state),
+    ...winsetChecker(state),
     ...markCounter(state),
   };
 };
 
-const subArrayGetter = (state) => ({
-  getSubArray: () => state.subArrays,
+const winSupersetArrayGetter = (state) => ({
+  getWinSupersetArray: () => state.winSupersetArray,
 });
 
 const winChecker = () => ({
@@ -163,8 +167,8 @@ const winChecker = () => ({
       notificationText.textContent = "CAT'S GAME!";
       gameDirector.setWinner("Draw");
     } else {
-      for (const winSet of winSets.getArray()) {
-        winSet.checkWinSet(winSet);
+      for (const winset of winsets.getWinsetsArray()) {
+        winset.checkWinset(winset);
       }
       if (gameDirector.getWinner() === null) {
         gameDirector.incrementTurn();
@@ -173,26 +177,26 @@ const winChecker = () => ({
   },
 });
 
-const winSets = (() => {
-  const allSquares = gameboard.getArray();
+const winsets = (() => {
+  const allSquares = gameboard.getSquaresArray();
 
-  const topRow = WinSet(allSquares.slice(0, 3));
-  const midRow = WinSet(allSquares.slice(3, 6));
-  const bottomRow = WinSet(allSquares.slice(6, 9));
-  const leftColumn = WinSet([allSquares[0], allSquares[3], allSquares[6]]);
-  const centerColumn = WinSet([allSquares[1], allSquares[4], allSquares[7]]);
-  const rightColumn = WinSet([allSquares[2], allSquares[5], allSquares[8]]);
-  const diagonalX = WinSet([allSquares[0], allSquares[4], allSquares[8]]);
-  const diagonalY = WinSet([allSquares[2], allSquares[4], allSquares[6]]);
+  const topRow = Winset(allSquares.slice(0, 3));
+  const midRow = Winset(allSquares.slice(3, 6));
+  const bottomRow = Winset(allSquares.slice(6, 9));
+  const leftColumn = Winset([allSquares[0], allSquares[3], allSquares[6]]);
+  const centerColumn = Winset([allSquares[1], allSquares[4], allSquares[7]]);
+  const rightColumn = Winset([allSquares[2], allSquares[5], allSquares[8]]);
+  const diagonalX = Winset([allSquares[0], allSquares[4], allSquares[8]]);
+  const diagonalY = Winset([allSquares[2], allSquares[4], allSquares[6]]);
 
-  const WinSetGroup = (set) => {
+  const WinsetGroup = (set) => {
     const state = {
-      gameSquares: set,
+      winsetsArray: set,
     };
-    return { ...gameSquaresGetter(state) };
+    return { ...winsetsArrayGetter(state) };
   };
 
-  const rowsAndColumns = WinSetGroup([
+  const rowsAndColumns = WinsetGroup([
     topRow,
     midRow,
     bottomRow,
@@ -200,11 +204,11 @@ const winSets = (() => {
     centerColumn,
     rightColumn,
   ]);
-  const diagonals = WinSetGroup([diagonalX, diagonalY]);
+  const diagonals = WinsetGroup([diagonalX, diagonalY]);
 
   const state = {
-    subArrays: [rowsAndColumns, diagonals],
-    gameSquares: [
+    winSupersetArray: [rowsAndColumns, diagonals],
+    winsetsArray: [
       topRow,
       midRow,
       bottomRow,
@@ -217,8 +221,8 @@ const winSets = (() => {
   };
 
   return {
-    ...gameSquaresGetter(state),
-    ...subArrayGetter(state),
+    ...winsetsArrayGetter(state),
+    ...winSupersetArrayGetter(state),
     ...winChecker(state),
   };
 })();
@@ -234,7 +238,7 @@ const newGameStarter = () => ({
 
 const gameboardSquareClearer = () => ({
   clearGameboardSquares: () => {
-    const gameboardSquares = gameboard.getArray();
+    const gameboardSquares = gameboard.getSquaresArray();
 
     for (const gameboardSquare of gameboardSquares) {
       gameboardSquare.setMark(null);
@@ -293,7 +297,7 @@ const moveSelectionHandler = () => ({
     const gameboardSquareIndex = gameboard
       .getGameSquareIDs()
       .indexOf(moveSelection);
-    const gameboardSquare = gameboard.getArray()[gameboardSquareIndex];
+    const gameboardSquare = gameboard.getSquaresArray()[gameboardSquareIndex];
     if (
       gameDirector.getWaitingStatus() === true &&
       gameboardSquare.getMark() === null
@@ -372,7 +376,7 @@ const gameDirector = (() => {
     ...playerNotifier(state),
     ...moveSelectionHandler(state),
     ...moveSelectionApplicator(state),
-    ...winChecker(winSets.state),
+    ...winChecker(winsets.state),
     ...currentProcessGetter(state),
     ...currentProcessSetter(state),
     ...turnIncrementer(state),
@@ -396,50 +400,50 @@ const possibleMoveGetter = (state) => ({
 });
 
 const moveMaker = (state) => {
-  const squares = gameboard.getArray();
+  const squares = gameboard.getSquaresArray();
   const makeAnyMove = () => {
     for (const square of squares) {
       if (square.getMark === null) {
         square.setMark(state.symbol);
-        winSets.checkWin();
+        winsets.checkWin();
       }
     }
   };
   const makeCrucialMove = () => {
-    for (const square of winSets.getArray()) {
+    for (const square of winset.getSquaresArray()) {
       square.setMark(state.symbol);
     }
-    winSets.checkWin();
+    winsets.checkWin();
   };
   const makeMove = () => {
     if (state.skill < Math.floor(Math.random() * 10)) {
       return makeAnyMove();
     }
-    for (const winSet of winSets.getArray()) {
+    for (const winset of winsets.getWinsetsArray()) {
       if (
-        winSet.countMarks(state.symbol) === 2 &&
-        winSet.countMarks(state.opponentSymbol) === 0
+        winset.countMarks(state.symbol) === 2 &&
+        winset.countMarks(state.opponentSymbol) === 0
       ) {
         return makeCrucialMove();
       }
     }
-    for (const winSet of winSets.getArray()) {
+    for (const winset of winsets.getWinsetsArray()) {
       if (
-        winSet.countMarks(state.symbol) === 0 &&
-        winSet.countMarks(state.opponentSymbol) === 2
+        winset.countMarks(state.symbol) === 0 &&
+        winset.countMarks(state.opponentSymbol) === 2
       ) {
         return makeCrucialMove();
       }
     }
-    for (const winSet of winSets.getSubArray()[0].getArray()) {
+    for (const winset of winsets.getWinSupersetArray()[0].getWinsetsArray()) {
       if (
-        winSet.countMarks(state.symbol) === 1 &&
-        winSet.countMarks(state.opponentSymbol) === 0
+        winset.countMarks(state.symbol) === 1 &&
+        winset.countMarks(state.opponentSymbol) === 0
       ) {
-        for (const square of winSet.getArray()) {
+        for (const square of winset.getSquaresArray()) {
           if (square.getMark() === null && square.getPosition() === "corner") {
             square.setMark(state.symbol);
-            return winSets.checkWin();
+            return winsets.checkWin();
           }
         }
       }
@@ -454,14 +458,14 @@ const moveMaker = (state) => {
           square.getPosition() === "corner"
         ) {
           squares[4].setMark(state.symbol);
-          return winSets.checkWin();
+          return winsets.checkWin();
         }
       }
     }
     for (const square of squares) {
       if (square.getPosition() === "corner" && square.getMark() === null) {
         square.setMark(state.symbol);
-        return winSets.checkWin();
+        return winsets.checkWin();
       }
     }
     return makeAnyMove();
@@ -479,7 +483,7 @@ const skillSetter = (state) => ({
 const ai = (() => {
   const state = {
     skill: 100,
-    possibleMoves: gameboard.getArray(),
+    possibleMoves: gameboard.getSquaresArray(),
     symbol: "X",
     opponentSymbol: "O",
   };

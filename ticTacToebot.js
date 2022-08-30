@@ -12,16 +12,39 @@ const speciesGetter = (state) => ({
   getSpecies: () => state.species,
 });
 
+const possibleMoveGetter = (state) => ({
+  getPossibleMoves: () => state.possibleMoves,
+});
+
+const possibleMoveAdder = (state) => ({
+  addPossibleMove: (possibleMove) => {
+    state.possibleMoves.push(possibleMove);
+  },
+});
+
+const possibleMoveChooser = (state) => ({
+  chooseFromPossibleMoves: () => {
+    const selectionIndex = Math.floor(Math.random() * state.possibleMoves.length);
+    const moveSelection = state.possibleMoves[selectionIndex];
+    state.possibleMoves = [];
+    return moveSelection;
+  },
+});
+
 const Player = (name, symbol, species) => {
   const state = {
     name,
     symbol,
     species,
+    possibleMoves: [],
   };
   return {
     ...nameGetter(state),
     ...symbolGetter(state),
     ...speciesGetter(state),
+    ...possibleMoveAdder(state),
+    ...possibleMoveGetter(state),
+    ...possibleMoveChooser(state),
   };
 };
 
@@ -407,35 +430,35 @@ const possibleMoveUpdater = (state) => ({
   },
 });
 
-const possibleMoveGetter = (state) => ({
-  getPossibleMoves: () => state.possibleMoves,
-});
-
 const moveSelector = (state) => {
   const squares = gameboard.getSquaresArray();
-  const think = (moveSelection) => {
+  const currentPlayer = gameDirector.getCurrentPlayer();
+  const think = () => {
     const notificationText = document.querySelector("#notificationText");
-    notificationText.textContent = `${gameDirector
-      .getCurrentPlayer()
-      .getName()} is thinking...`;
+    notificationText.textContent = `${currentPlayer.getName()} is thinking...`;
+    const moveSelection = currentPlayer.chooseFromPossibleMoves().getName();
     setTimeout(gameDirector.handleMoveSelection, 1000, moveSelection);
   };
   const selectAnyMove = () => {
     for (const square of squares) {
       if (square.getMark() === null) {
-        return think(square.getName);
+        currentPlayer.addPossibleMove(square);
       }
     }
+    return think();
   };
+  
   const selectCrucialMove = (winset) => {
     for (const square of winset.getSquaresArray()) {
       if (square.getMark() === null) {
-        return think(square.getName());
+        currentPlayer.addPossibleMove(square);
       }
     }
+    return think();
   };
   const selectMove = () => {
     if (state.skill < Math.floor(Math.random() * 10)) {
+    // if (true) {
       return selectAnyMove();
     }
     for (const winset of winsets.getWinsetsArray()) {
@@ -461,10 +484,13 @@ const moveSelector = (state) => {
       ) {
         for (const square of winset.getSquaresArray()) {
           if (square.getMark() === null && square.getPosition() === "corner") {
-            return think(square.getName());
+            currentPlayer.addPossibleMove(square);
           }
         }
       }
+    }
+    if (currentPlayer.getPossibleMoves().length > 0) {
+      return think();
     }
     if (
       gameboard.countMarks(state.symbol) === 0 &&
@@ -473,22 +499,31 @@ const moveSelector = (state) => {
       for (const square of squares) {
         if (
           square.getMark() === state.opponentSymbol &&
-          square.getPosition() === "corner"
+          square.getPosition() === "corner" && squares[4].getMark() === null
         ) {
-          return think(squares[4].getName());
+          currentPlayer.addPossibleMove(squares[4]);
+          return think();
         }
       }
     }
     for (const square of squares) {
       if (square.getPosition() === "corner" && square.getMark() === null) {
-        return think(square.getName());
+        currentPlayer.addPossibleMove(square);
       }
+    }
+    if (currentPlayer.getPossibleMoves().length > 0) {
+      return think();
     }
     return selectAnyMove();
   };
 
   return { selectMove };
 };
+
+const skillGetter = (state) => ({
+  getSkill: () => 
+    state.skill
+});
 
 const skillSetter = (state) => ({
   setSkill: (integer) => {
@@ -499,15 +534,17 @@ const skillSetter = (state) => ({
 const ai = (() => {
   const state = {
     skill: 100,
-    possibleMoves: gameboard.getSquaresArray(),
+    possibleMoves: [],
     symbol: "X",
     opponentSymbol: "O",
   };
   return {
-    ...possibleMoveUpdater(state),
+    ...possibleMoveAdder(state),
     ...possibleMoveGetter(state),
+    ...possibleMoveChooser(state),
     ...moveSelector(state),
     ...skillSetter(state),
+    ...skillGetter(state),
   };
 })();
 

@@ -48,17 +48,19 @@ const nameSetter = (state) => ({
 
 const nameChanger = (state) => ({
   changeName: () => {
-    player1.setName(prompt("Enter Player1's Name", "Human Challenger"));
-    player1Card.updateNameDisplay(player1.getName());
+    // if (!gameDirector.getActiveStatus()) {
+      player1.setName(prompt("Enter Player1's Name", "Human Challenger"));
+      player1Card.updateNameDisplay(player1.getName());
+    // }
   },
 });
 
 const cardNameGetter = (state) => ({
-  getcardName: () => state.cardName,
+  getCardName: () => state.cardName,
 });
 
 const skillLevelGetter = (state) => ({
-  getskillLevel: () => state.skillLevel,
+  getSkillLevel: () => state.skillLevel,
 });
 
 const SkillClass = (index, name, cardName, skillLevel) => {
@@ -83,16 +85,25 @@ const impossible = SkillClass("3", "impossible", "Unbeatable Master", "100");
 
 const skillListGetter = (state) => ({
   getSkillList: () => state.skillList,
-})
+});
 
 const skillChanger = (state) => ({
   changeSkill: () => {
-    const skillList = ai.getSkillList();
-    const skillClass = ai.getSkillClass();
-    let newSkillClassIndex = +skillClass.getIndex() + 1;
-    if (newSkillClassIndex > 3) {newSkillClassIndex = 0};
-    ai.setSkillClass(skillList[newSkillClassIndex]);
-    player2Card.updateNameDisplay(ai.getSkillClass().getName());
+    // if (!gameDirector.getActiveStatus()) {
+      const skillList = ai.getSkillList();
+      const skillClass = ai.getSkillClass();
+      let newSkillClassIndex = +skillClass.getIndex() + 1;
+      if (newSkillClassIndex > 3) {
+        newSkillClassIndex = 0;
+      }
+      ai.setSkillClass(skillList[newSkillClassIndex]);
+      player2Card.updateNameDisplay(ai.getSkillClass().getCardName());
+      player2.setName(ai.getSkillClass().getCardName());
+      document.querySelector("#player2SkillButton").textContent = ai
+        .getSkillClass()
+        .getName()
+        .toUpperCase();
+    // }
   },
 });
 
@@ -145,8 +156,8 @@ const Player = (name, symbol, species) => {
   };
 };
 
-const player1 = Player("Player 1", "X", "computer");
-const player2 = Player("Player 2", "O", "human");
+const player1 = Player("Human Challenger", "O", "human");
+const player2 = Player("Schoolyard Champ", "X", "computer");
 
 const markGetter = (state) => ({
   getMark: () => state.mark,
@@ -256,12 +267,13 @@ const gameboard = (() => {
 const winsetChecker = () => ({
   checkWinset: (winset) => {
     const notificationText = document.querySelector("#notificationText");
-    if (winset.countMarks("X") === 3) {
-      notificationText.textContent = "X WINS";
+    if (winset.countMarks(gameDirector.getCurrentPlayer().getSymbol()) === 3) {
+      notificationText.textContent = `${gameDirector
+        .getCurrentPlayer()
+        .getName()
+        .toUpperCase()} WINS`;
       gameDirector.setWinner();
-    } else if (winset.countMarks("O") === 3) {
-      notificationText.textContent = "O WINS";
-      gameDirector.setWinner();
+      gameDirector.setActiveStatus(false);
     }
   },
 });
@@ -292,6 +304,7 @@ const winChecker = () => ({
     ) {
       notificationText.textContent = "CAT'S GAME!";
       gameDirector.setWinner("Draw");
+      gameDirector.setActiveStatus(false);
     }
     if (gameDirector.getWinner() === null) {
       gameDirector.incrementTurn();
@@ -351,16 +364,17 @@ const winsets = (() => {
 
 const playerButtonDeactivator = () => ({
   deactivatePlayerButtons: () => {
-    const playerButtons = document.querySelectorAll('.playerButton');
+    const playerButtons = document.querySelectorAll(".playerButton");
     for (const playerButton of playerButtons) {
-      playerButton.classList.remove('invertColor');
-      playerButton.style['background-color'] = '#000408';
+      playerButton.classList.remove("invertColor");
+      playerButton.style["background-color"] = "#000408";
     }
-  }
+  },
 });
 
 const newGameStarter = (state) => ({
   startNewGame: () => {
+    gameDirector.setActiveStatus(true);
     gameDirector.deactivatePlayerButtons();
     gameDirector.clearGameboardSquares();
     gameDirector.clearDOMSquares();
@@ -487,13 +501,13 @@ const currentPlayerSetter = (state) => ({
   },
 });
 
-const currentProcessGetter = (state) => ({
-  getCurrentProcess: () => state.currentProcess,
+const activeStatusGetter = (state) => ({
+  getActiveStatus: () => state.activeStatus,
 });
 
-const currentProcessSetter = (state) => ({
-  setCurrentProcess: (process) => {
-    state.currentProcess = process;
+const activeStatusSetter = (state) => ({
+  setActiveStatus: (status) => {
+    state.activeStatus = status;
   },
 });
 
@@ -521,8 +535,8 @@ const winnerSetter = (state) => ({
 const gameDirector = (() => {
   const state = {
     name: "gameDirector",
-    currentPlayer: player1,
-    currentProcess: null,
+    currentPlayer: player2,
+    activeStatus: false,
     winner: null,
     waitingStatus: false,
   };
@@ -542,8 +556,8 @@ const gameDirector = (() => {
     ...moveSelectionHandler(state),
     ...moveSelectionApplicator(state),
     ...winChecker(winsets.state),
-    ...currentProcessGetter(state),
-    ...currentProcessSetter(state),
+    ...activeStatusGetter(state),
+    ...activeStatusSetter(state),
     ...turnIncrementer(state),
     ...winnerGetter(state),
     ...winnerSetter(state),
@@ -588,8 +602,7 @@ const moveSelector = (state) => {
   };
   const selectMove = () => {
     const skillDC = Math.floor(Math.random() * 100);
-    if (state.skill < skillDC) {
-      // if (true) {
+    if (state.skillClass.getSkillLevel() < skillDC) {
       return selectAnyMove();
     }
     for (const winset of winsets.getWinsetsArray()) {
@@ -677,21 +690,10 @@ const skillClassSetter = (state) => ({
   },
 });
 
-const skillGetter = (state) => ({
-  getSkill: () => state.skill,
-});
-
-const skillSetter = (state) => ({
-  setSkill: (integer) => {
-    state.skill = integer;
-  },
-});
-
 const ai = (() => {
   const state = {
     skillList: [easy, medium, hard, impossible],
     skillClass: hard,
-    skill: 80,
     possibleMoves: [],
     symbol: "X",
     opponentSymbol: "O",
@@ -701,12 +703,9 @@ const ai = (() => {
     ...possibleMoveGetter(state),
     ...possibleMoveChooser(state),
     ...moveSelector(state),
-    ...skillSetter(state),
-    ...skillGetter(state),
     ...skillListGetter(state),
     ...skillClassGetter(state),
     ...skillClassSetter(state),
-
   };
 })();
 
@@ -742,11 +741,9 @@ const colorUpdater = (state) => ({
     document.querySelector(
       "body"
     ).style.color = `hsl(${state.rainbowHue}, 100%, 80%)`;
-    const colorInvertedElements = document.querySelectorAll(
-      ".invertColor"
-    );
+    const colorInvertedElements = document.querySelectorAll(".invertColor");
     for (const element of colorInvertedElements) {
-      element.style['background-color'] = `hsl(${state.rainbowHue}, 100%, 80%)`;
+      element.style["background-color"] = `hsl(${state.rainbowHue}, 100%, 80%)`;
     }
   },
 });

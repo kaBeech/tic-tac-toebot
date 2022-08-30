@@ -49,8 +49,8 @@ const nameSetter = (state) => ({
 const nameChanger = (state) => ({
   changeName: () => {
     // if (!gameDirector.getActiveStatus()) {
-      player1.setName(prompt("Enter Player1's Name", "Human Challenger"));
-      player1Card.updateNameDisplay(player1.getName());
+    player1.setName(prompt("Enter Player1's Name", "Human Challenger"));
+    player1Card.updateNameDisplay(player1.getName());
     // }
   },
 });
@@ -90,19 +90,19 @@ const skillListGetter = (state) => ({
 const skillChanger = (state) => ({
   changeSkill: () => {
     // if (!gameDirector.getActiveStatus()) {
-      const skillList = ai.getSkillList();
-      const skillClass = ai.getSkillClass();
-      let newSkillClassIndex = +skillClass.getIndex() + 1;
-      if (newSkillClassIndex > 3) {
-        newSkillClassIndex = 0;
-      }
-      ai.setSkillClass(skillList[newSkillClassIndex]);
-      player2Card.updateNameDisplay(ai.getSkillClass().getCardName());
-      player2.setName(ai.getSkillClass().getCardName());
-      document.querySelector("#player2SkillButton").textContent = ai
-        .getSkillClass()
-        .getName()
-        .toUpperCase();
+    const skillList = ai.getSkillList();
+    const skillClass = player2.getSkillClass();
+    let newSkillClassIndex = +skillClass.getIndex() + 1;
+    if (newSkillClassIndex > 3) {
+      newSkillClassIndex = 0;
+    }
+    player2.setSkillClass(skillList[newSkillClassIndex]);
+    player2Card.updateNameDisplay(player2.getSkillClass().getCardName());
+    player2.setName(player2.getSkillClass().getCardName());
+    document.querySelector("#player2SkillButton").textContent = player2
+      .getSkillClass()
+      .getName()
+      .toUpperCase();
     // }
   },
 });
@@ -136,12 +136,23 @@ const possibleMoveChooser = (state) => ({
   },
 });
 
+const skillClassGetter = (state) => ({
+  getSkillClass: () => state.skillClass,
+});
+
+const skillClassSetter = (state) => ({
+  setSkillClass: (newSkillClass) => {
+    state.skillClass = newSkillClass;
+  },
+});
+
 const Player = (name, symbol, species) => {
   const state = {
     name,
     symbol,
     species,
     possibleMoves: [],
+    skillClass: hard,
   };
   return {
     ...nameGetter(state),
@@ -153,6 +164,8 @@ const Player = (name, symbol, species) => {
     ...possibleMoveAdder(state),
     ...possibleMoveGetter(state),
     ...possibleMoveChooser(state),
+    ...skillClassGetter(state),
+    ...skillClassSetter(state),
   };
 };
 
@@ -682,20 +695,9 @@ const moveSelector = (state) => {
   return { selectMove };
 };
 
-const skillClassGetter = (state) => ({
-  getSkillClass: () => state.skillClass,
-});
-
-const skillClassSetter = (state) => ({
-  setSkillClass: (newSkillClass) => {
-    state.skillClass = newSkillClass;
-  },
-});
-
 const ai = (() => {
   const state = {
     skillList: [easy, medium, hard, impossible],
-    skillClass: hard,
     possibleMoves: [],
     symbol: "X",
     opponentSymbol: "O",

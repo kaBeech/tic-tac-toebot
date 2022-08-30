@@ -87,16 +87,22 @@ const skillListGetter = (state) => ({
   getSkillList: () => state.skillList,
 });
 
-const skillChanger = (state) => ({
-  changeSkill: () => {
-    // if (!gameDirector.getActiveStatus()) {
-    const skillList = ai.getSkillList();
+const skillClassIncrementer = (state) => ({
+  incrementSkillClass: () => {
     const skillClass = player2.getSkillClass();
+    const skillList = ai.getSkillList();
     let newSkillClassIndex = +skillClass.getIndex() + 1;
     if (newSkillClassIndex > 3) {
       newSkillClassIndex = 0;
     }
     player2.setSkillClass(skillList[newSkillClassIndex]);
+  },
+});
+
+const skillChanger = (state) => ({
+  changeSkill: () => {
+    // if (!gameDirector.getActiveStatus()) {
+    player2.incrementSkillClass();
     player2Card.updateNameDisplay(player2.getSkillClass().getCardName());
     player2.setName(player2.getSkillClass().getCardName());
     document.querySelector("#player2SkillButton").textContent = player2
@@ -166,6 +172,7 @@ const Player = (name, symbol, species) => {
     ...possibleMoveChooser(state),
     ...skillClassGetter(state),
     ...skillClassSetter(state),
+    ...skillClassIncrementer(state),
   };
 };
 
@@ -617,7 +624,7 @@ const moveSelector = (state) => {
   };
   const selectMove = () => {
     const skillDC = Math.floor(Math.random() * 100);
-    if (state.skillClass.getSkillLevel() < skillDC) {
+    if (player2.getSkillClass().getSkillLevel() < skillDC) {
       return selectAnyMove();
     }
     for (const winset of winsets.getWinsetsArray()) {

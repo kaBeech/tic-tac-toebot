@@ -46,7 +46,7 @@ const nameSetter = (state) => ({
   },
 });
 
-const nameChanger = (state) => ({
+const nameChanger = () => ({
   changeName: () => {
     // if (!gameDirector.getActiveStatus()) {
     player1.setName(prompt("Enter Player1's Name", "Human Challenger"));
@@ -99,7 +99,7 @@ const skillClassIncrementer = () => ({
   },
 });
 
-const skillChanger = (state) => ({
+const skillChanger = () => ({
   changeSkill: () => {
     // if (!gameDirector.getActiveStatus()) {
     const player2SkillButton = document.querySelector("#player2SkillButton");
@@ -393,7 +393,7 @@ const playerButtonDeactivator = () => ({
   },
 });
 
-const newGameStarter = (state) => ({
+const newGameStarter = () => ({
   startNewGame: () => {
     gameDirector.setActiveStatus(true);
     gameDirector.deactivatePlayerButtons();
@@ -587,16 +587,6 @@ const gameDirector = (() => {
   };
 })();
 
-const possibleMoveUpdater = (state) => ({
-  updatePossibleMoves: () => {
-    for (const square of state.possibleMoves) {
-      if (square.getMark() !== null) {
-        state.possibleMoves.splice(state.possibleMoves.indexOf(square), 1);
-      }
-    }
-  },
-});
-
 const moveSelector = (state) => {
   const squares = gameboard.getSquaresArray();
   const currentPlayer = gameDirector.getCurrentPlayer();
@@ -715,7 +705,7 @@ const ai = (() => {
   };
 })();
 
-const humanMoveSelector = (state) => ({
+const humanMoveSelector = () => ({
   selectHumanMove: (moveSelection) => {
     if (gameDirector.getCurrentPlayer().getSpecies() === "human") {
       gameDirector.handleMoveSelection(moveSelection);
@@ -762,12 +752,19 @@ const colorController = (() => {
   return { ...rainbowShifter(state), ...colorUpdater(state) };
 })();
 
-const pageInitializer = (() => {
+const pageInitializer = () => ({
+  initializePage: () => {
+    setInterval(colorController.shiftRainbow, 250);
+    setInterval(colorController.updateColor, 250);
+    gameDirector.assignSquares();
+  }
+})
+
+const pageController = (() => {
   const state = {
-    name: "pageInitializer",
+    name: "pageController",
   };
-  setInterval(colorController.shiftRainbow, 250);
-  setInterval(colorController.updateColor, 250);
-  gameDirector.assignSquares();
-  return { ...nameGetter(state) };
+  return { ...nameGetter(state), ...pageInitializer(state), };
 })();
+
+pageController.initializePage();

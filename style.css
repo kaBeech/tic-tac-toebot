@@ -13,11 +13,11 @@ body {
 }
 
 .gameSquare {
-    width: 8rem;
+    width: 7rem;
     aspect-ratio: 1;
     border-style: solid;
     border-radius: 10%;
-    font-size: 7rem;
+    font-size: 6rem;
     display: flex;
     align-items: center;
     justify-content: center;

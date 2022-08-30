@@ -24,7 +24,9 @@ const possibleMoveAdder = (state) => ({
 
 const possibleMoveChooser = (state) => ({
   chooseFromPossibleMoves: () => {
-    const selectionIndex = Math.floor(Math.random() * state.possibleMoves.length);
+    const selectionIndex = Math.floor(
+      Math.random() * state.possibleMoves.length
+    );
     const moveSelection = state.possibleMoves[selectionIndex];
     state.possibleMoves = [];
     return moveSelection;
@@ -447,7 +449,7 @@ const moveSelector = (state) => {
     }
     return think();
   };
-  
+
   const selectCrucialMove = (winset) => {
     for (const square of winset.getSquaresArray()) {
       if (square.getMark() === null) {
@@ -458,7 +460,7 @@ const moveSelector = (state) => {
   };
   const selectMove = () => {
     if (state.skill < Math.floor(Math.random() * 10)) {
-    // if (true) {
+      // if (true) {
       return selectAnyMove();
     }
     for (const winset of winsets.getWinsetsArray()) {
@@ -499,7 +501,8 @@ const moveSelector = (state) => {
       for (const square of squares) {
         if (
           square.getMark() === state.opponentSymbol &&
-          square.getPosition() === "corner" && squares[4].getMark() === null
+          square.getPosition() === "corner" &&
+          squares[4].getMark() === null
         ) {
           currentPlayer.addPossibleMove(squares[4]);
           return think();
@@ -521,8 +524,7 @@ const moveSelector = (state) => {
 };
 
 const skillGetter = (state) => ({
-  getSkill: () => 
-    state.skill
+  getSkill: () => state.skill,
 });
 
 const skillSetter = (state) => ({
@@ -533,7 +535,7 @@ const skillSetter = (state) => ({
 
 const ai = (() => {
   const state = {
-    skill: 100,
+    skill: 80,
     possibleMoves: [],
     symbol: "X",
     opponentSymbol: "O",

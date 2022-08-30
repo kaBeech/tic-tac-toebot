@@ -11,21 +11,43 @@
 <body class="flex column">
     <h1 id="title">Tic-Tac-Toebot</h1>
     <h2 id="notificationText"></h2>
-    <div id="gameboard" class="flex column">
-        <div class="flex">
-            <div id="topLeft" class="gameSquare">X</div>
-            <div id="topCenter" class="gameSquare">O</div>
-            <div id="topRight" class="gameSquare">X</div>
+    <div id="middleSection" class="flex">
+        <div id="player1Card" class="playerCard flex column">
+            <h1>PLAYER 1</h1>
+            <h2 id="player1Name">Human Challenger</h2>
+            <div id="player1Buttons" class="playerButtons flex">
+                <div id="player1SpeciesButton" class="playerbutton">HUMAN</div>
+                <div id="player1NameButton" class="playerbutton">NAME</div>
+                <div id="player1SymbolButton" class="playerbutton">O</div>
+                <div id="player1TurnOrderButton" class="playerbutton">2ND</div>
+            </div>
         </div>
-        <div class="flex">
-            <div id="midLeft" class="gameSquare">O</div>
-            <div id="midCenter" class="gameSquare">X</div>
-            <div id="midRight" class="gameSquare">O</div>
+        <div id="gameboard" class="flex column">
+            <div class="flex">
+                <div id="topLeft" class="gameSquare">X</div>
+                <div id="topCenter" class="gameSquare">O</div>
+                <div id="topRight" class="gameSquare">X</div>
+            </div>
+            <div class="flex">
+                <div id="midLeft" class="gameSquare">O</div>
+                <div id="midCenter" class="gameSquare">X</div>
+                <div id="midRight" class="gameSquare">O</div>
+            </div>
+            <div class="flex">
+                <div id="bottomLeft" class="gameSquare">X</div>
+                <div id="bottomCenter" class="gameSquare">O</div>
+                <div id="bottomRight" class="gameSquare">X</div>
+            </div>
         </div>
-        <div class="flex">
-            <div id="bottomLeft" class="gameSquare">X</div>
-            <div id="bottomCenter" class="gameSquare">O</div>
-            <div id="bottomRight" class="gameSquare">X</div>
+        <div id="player2Card" class="playerCard flex column">
+            <h1>PLAYER 2</h1>
+            <h2 id="player2Name">Schoolyard Champ</h2>
+            <div id="player2Buttons" class="playerButtons flex">
+                <div id="player2SpeciesButton" class="playerbutton">COMPUTER</div>
+                <div id="player2NameButton" class="playerbutton">HARD</div>
+                <div id="player2SymbolButton" class="playerbutton">X</div>
+                <div id="player2TurnOrderButton" class="playerbutton">1ST</div>
+            </div>
         </div>
     </div>
     <button id="newGameButton">New Game</button>

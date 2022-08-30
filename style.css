@@ -16,6 +16,7 @@ body {
     width: 8rem;
     aspect-ratio: 1;
     border-style: solid;
+    border-radius: 10%;
     font-size: 7rem;
     display: flex;
     align-items: center;

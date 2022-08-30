@@ -87,7 +87,7 @@ const skillListGetter = (state) => ({
   getSkillList: () => state.skillList,
 });
 
-const skillClassIncrementer = (state) => ({
+const skillClassIncrementer = () => ({
   incrementSkillClass: () => {
     const skillClass = player2.getSkillClass();
     const skillList = ai.getSkillList();
@@ -102,10 +102,11 @@ const skillClassIncrementer = (state) => ({
 const skillChanger = (state) => ({
   changeSkill: () => {
     // if (!gameDirector.getActiveStatus()) {
+    const player2SkillButton = document.querySelector("#player2SkillButton");
     player2.incrementSkillClass();
     player2Card.updateNameDisplay(player2.getSkillClass().getCardName());
     player2.setName(player2.getSkillClass().getCardName());
-    document.querySelector("#player2SkillButton").textContent = player2
+    player2SkillButton.textContent = player2
       .getSkillClass()
       .getName()
       .toUpperCase();

@@ -38,7 +38,7 @@ h1 {
     align-items: flex-start;
 } */
 
-.playerButton {
+.button {
     width: 8.5rem;
     height: 1.5rem;
     justify-content: center;
@@ -64,4 +64,13 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+#notificationText {
+    height: 1.75rem;
+    margin-bottom: 1.75rem;
+}
+
+#newGameButton {
+    margin: 1rem;
 }

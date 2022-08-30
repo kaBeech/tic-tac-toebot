@@ -9,6 +9,10 @@ body {
     color: #000408;   
 }
 
+.regularColor {
+    background-color: #000408;
+}
+
 h1 {
     margin: 0;
 }
@@ -22,7 +26,7 @@ h1 {
 }
 
 #middleSection {
-    gap: 1rem;
+    gap: 2rem;
 }
 
 .playerCard {
@@ -40,7 +44,7 @@ h1 {
 
 .button {
     width: 8.5rem;
-    height: 1.6rem;
+    height: 1.8rem;
     justify-content: center;
     border-style: solid;
     border-radius: 10%;

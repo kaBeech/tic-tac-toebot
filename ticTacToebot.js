@@ -167,9 +167,6 @@ const winsetChecker = () => ({
     } else if (winset.countMarks("O") === 3) {
       notificationText.textContent = "O WINS";
       gameDirector.setWinner();
-    } else if (winset.countMarks("O") === 3) {
-      notificationText.textContent = "O WINS";
-      gameDirector.setWinner();
     }
   },
 });
@@ -257,8 +254,19 @@ const winsets = (() => {
   };
 })();
 
+const playerButtonDeactivator = () => ({
+  deactivatePlayerButtons: () => {
+    const playerButtons = document.querySelectorAll('.playerButton');
+    for (playerButton of playerButtons) {
+      playerButton.classList.remove('invertColor');
+      playerButton.style['background-color'] = '#000408';
+    }
+  }
+});
+
 const newGameStarter = () => ({
   startNewGame: () => {
+    gameDirector.deactivatePlayerButtons();
     gameDirector.clearGameboardSquares();
     gameDirector.clearDOMSquares();
     gameDirector.setWinner(null);
@@ -289,16 +297,40 @@ const domSquareClearer = () => ({
 const domAssigner = () => ({
   assignSquares: () => {
     const domSquares = document.querySelectorAll(".gameSquare");
+    const player1Buttons = document.querySelector(".player1Button");
+    const player2Buttons = document.querySelector(".player12utton");
     const newGameButton = document.querySelector("#newGameButton");
 
     for (const domSquare of domSquares) {
       domSquare.addEventListener("click", () => {
-        // eslint-disable-next-line no-use-before-define
         human.selectHumanMove(domSquare.id);
       });
     }
+    player1Buttons[0].addEventListener("click", () => {
+      player1.changeSpecies();
+    });
+    player1Buttons[1].addEventListener("click", () => {
+      player1.changeName();
+    });
+    player1Buttons[2].addEventListener("click", () => {
+      player1.changeSymbol();
+    });
+    player1Buttons[3].addEventListener("click", () => {
+      player1.changeTurnOrder();
+    });
+    player2Buttons[0].addEventListener("click", () => {
+      player2.changeSpecies();
+    });
+    player2Buttons[1].addEventListener("click", () => {
+      player2.changeName();
+    });
+    player2Buttons[2].addEventListener("click", () => {
+      player2.changeSymbol();
+    });
+    player2Buttons[3].addEventListener("click", () => {
+      player2.changeTurnOrder();
+    });
     newGameButton.addEventListener("click", () => {
-      // eslint-disable-next-line no-use-before-define
       gameDirector.startNewGame();
     });
   },
@@ -402,6 +434,7 @@ const gameDirector = (() => {
 
   return {
     ...newGameStarter(state),
+    ...playerButtonDeactivator(state),
     ...waitingStatusGetter(state),
     ...waitingStatusSetter(state),
     ...nameGetter(state),

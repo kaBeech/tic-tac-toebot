@@ -1,7 +1,99 @@
 /* eslint-disable no-restricted-syntax */
 
+const nameDisplayGetter = (state) => ({
+  getNameDisplay: () => state.nameDisplay,
+});
+
+const nameDisplayUpdater = (state) => ({
+  updateNameDisplay: (newName) => {
+    state.nameDisplay.textContent = newName;
+  },
+});
+
+const player1Card = (() => {
+  const state = {
+    nameDisplay: document.querySelector("#player1Name"),
+  };
+
+  return {
+    ...nameDisplayGetter(state),
+    ...nameDisplayUpdater(state),
+  };
+})();
+
+const player2Card = (() => {
+  const state = {
+    nameDisplay: document.querySelector("#player2Name"),
+  };
+
+  return {
+    ...nameDisplayGetter(state),
+    ...nameDisplayUpdater(state),
+  };
+})();
+
+const indexGetter = (state) => ({
+  getIndex: () => state.index,
+});
+
 const nameGetter = (state) => ({
   getName: () => state.name,
+});
+
+const nameSetter = (state) => ({
+  setName: (newName) => {
+    state.name = newName;
+  },
+});
+
+const nameChanger = (state) => ({
+  changeName: () => {
+    player1.setName(prompt("Enter Player1's Name", "Human Challenger"));
+    player1Card.updateNameDisplay(player1.getName());
+  },
+});
+
+const cardNameGetter = (state) => ({
+  getcardName: () => state.cardName,
+});
+
+const skillLevelGetter = (state) => ({
+  getskillLevel: () => state.skillLevel,
+});
+
+const SkillClass = (index, name, cardName, skillLevel) => {
+  const state = {
+    index,
+    name,
+    cardName,
+    skillLevel,
+  };
+  return {
+    ...indexGetter(state),
+    ...nameGetter(state),
+    ...cardNameGetter(state),
+    ...skillLevelGetter(state),
+  };
+};
+
+const easy = SkillClass("0", "easy", "Random Picker", "0");
+const medium = SkillClass("1", "medium", "Distracted Doodler", "50");
+const hard = SkillClass("2", "hard", "Schoolyard Champ", "80");
+const impossible = SkillClass("3", "impossible", "Unbeatable Master", "100");
+
+const skillListGetter = (state) => ({
+  getSkillList: () => state.skillList,
+})
+
+const skillChanger = (state) => ({
+  changeSkill: () => {
+    const skillList = ai.getSkillList();
+    const skillClass = ai.getSkillClass();
+    let newSkillClassIndex = +skillClass.getIndex() + 1;
+    if (newSkillClassIndex > 3) {newSkillClassIndex = 0};
+    ai.setSkillClass(skillList[newSkillClassIndex]);
+    player2Card.updateNameDisplay(ai.getSkillClass().getName());
+  },
 });
 
 const symbolGetter = (state) => ({
@@ -42,6 +134,9 @@ const Player = (name, symbol, species) => {
   };
   return {
     ...nameGetter(state),
+    ...nameSetter(state),
+    ...nameChanger(state),
+    ...skillChanger(state),
     ...symbolGetter(state),
     ...speciesGetter(state),
     ...possibleMoveAdder(state),
@@ -257,14 +352,14 @@ const winsets = (() => {
 const playerButtonDeactivator = () => ({
   deactivatePlayerButtons: () => {
     const playerButtons = document.querySelectorAll('.playerButton');
-    for (playerButton of playerButtons) {
+    for (const playerButton of playerButtons) {
       playerButton.classList.remove('invertColor');
       playerButton.style['background-color'] = '#000408';
     }
   }
 });
 
-const newGameStarter = () => ({
+const newGameStarter = (state) => ({
   startNewGame: () => {
     gameDirector.deactivatePlayerButtons();
     gameDirector.clearGameboardSquares();
@@ -297,8 +392,8 @@ const domSquareClearer = () => ({
 const domAssigner = () => ({
   assignSquares: () => {
     const domSquares = document.querySelectorAll(".gameSquare");
-    const player1Buttons = document.querySelector(".player1Button");
-    const player2Buttons = document.querySelector(".player12utton");
+    const player1Buttons = document.querySelectorAll(".player1Button");
+    const player2Buttons = document.querySelectorAll(".player2Button");
     const newGameButton = document.querySelector("#newGameButton");
 
     for (const domSquare of domSquares) {
@@ -306,30 +401,30 @@ const domAssigner = () => ({
         human.selectHumanMove(domSquare.id);
       });
     }
-    player1Buttons[0].addEventListener("click", () => {
-      player1.changeSpecies();
-    });
+    // player1Buttons[0].addEventListener("click", () => {
+    //   player1.changeSpecies();
+    // });
     player1Buttons[1].addEventListener("click", () => {
       player1.changeName();
     });
-    player1Buttons[2].addEventListener("click", () => {
-      player1.changeSymbol();
-    });
-    player1Buttons[3].addEventListener("click", () => {
-      player1.changeTurnOrder();
-    });
-    player2Buttons[0].addEventListener("click", () => {
-      player2.changeSpecies();
-    });
+    // player1Buttons[2].addEventListener("click", () => {
+    //   player1.changeSymbol();
+    // });
+    // player1Buttons[3].addEventListener("click", () => {
+    //   player1.changeTurnOrder();
+    // });
+    // player2Buttons[0].addEventListener("click", () => {
+    //   player2.changeSpecies();
+    // });
     player2Buttons[1].addEventListener("click", () => {
-      player2.changeName();
+      player2.changeSkill();
     });
-    player2Buttons[2].addEventListener("click", () => {
-      player2.changeSymbol();
-    });
-    player2Buttons[3].addEventListener("click", () => {
-      player2.changeTurnOrder();
-    });
+    // player2Buttons[2].addEventListener("click", () => {
+    //   player2.changeSymbol();
+    // });
+    // player2Buttons[3].addEventListener("click", () => {
+    //   player2.changeTurnOrder();
+    // });
     newGameButton.addEventListener("click", () => {
       gameDirector.startNewGame();
     });
@@ -572,6 +667,16 @@ const moveSelector = (state) => {
   return { selectMove };
 };
 
+const skillClassGetter = (state) => ({
+  getSkillClass: () => state.skillClass,
+});
+
+const skillClassSetter = (state) => ({
+  setSkillClass: (newSkillClass) => {
+    state.skillClass = newSkillClass;
+  },
+});
+
 const skillGetter = (state) => ({
   getSkill: () => state.skill,
 });
@@ -584,6 +689,8 @@ const skillSetter = (state) => ({
 
 const ai = (() => {
   const state = {
+    skillList: [easy, medium, hard, impossible],
+    skillClass: hard,
     skill: 80,
     possibleMoves: [],
     symbol: "X",
@@ -596,6 +703,10 @@ const ai = (() => {
     ...moveSelector(state),
     ...skillSetter(state),
     ...skillGetter(state),
+    ...skillListGetter(state),
+    ...skillClassGetter(state),
+    ...skillClassSetter(state),
+
   };
 })();
 

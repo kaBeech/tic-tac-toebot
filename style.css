@@ -4,12 +4,49 @@ body {
     color: #def;
 }
 
+.invertColor {
+    background-color: #def;
+    color: #000408;   
+}
+
+h1 {
+    margin: 0;
+}
+
 .flex {
     display: flex;
 }
 
 .column {
     flex-direction: column;
+}
+
+#middleSection {
+    gap: 1rem;
+}
+
+.playerCard {
+    justify-content: space-around;
+    align-items: center;
+}
+
+/* #player1Card {
+    align-items: flex-end;
+}
+
+#player2Card {
+    align-items: flex-start;
+} */
+
+.playerButton {
+    width: 8rem;
+    text-align: center;
+    border-style: solid;
+    border-radius: 10%;
+}
+
+.playerButtons {
+    gap: 1rem;
 }
 
 .gameSquare {

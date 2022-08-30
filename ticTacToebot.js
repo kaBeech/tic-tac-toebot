@@ -27,7 +27,6 @@ const possibleMoveChooser = (state) => ({
     const selectionIndex = Math.floor(
       Math.random() * state.possibleMoves.length
     );
-    console.log(selectionIndex)
     const moveSelection = state.possibleMoves[selectionIndex];
     state.possibleMoves = [];
     return moveSelection;
@@ -461,7 +460,6 @@ const moveSelector = (state) => {
   };
   const selectMove = () => {
     const skillDC = Math.floor(Math.random() * 100);
-    console.log(skillDC);
     if (state.skill < skillDC) {
       // if (true) {
       return selectAnyMove();

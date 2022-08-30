@@ -40,7 +40,7 @@ h1 {
 
 .button {
     width: 8.5rem;
-    height: 1.5rem;
+    height: 1.6rem;
     justify-content: center;
     border-style: solid;
     border-radius: 10%;
@@ -72,5 +72,8 @@ h1 {
 }
 
 #newGameButton {
+    width: 10rem;
+    height: 2rem;
+    font-size: 1.6rem;
     margin: 1rem;
 }

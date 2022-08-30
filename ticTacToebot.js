@@ -698,18 +698,12 @@ const moveSelector = (state) => {
 const ai = (() => {
   const state = {
     skillList: [easy, medium, hard, impossible],
-    possibleMoves: [],
     symbol: "X",
     opponentSymbol: "O",
   };
   return {
-    ...possibleMoveAdder(state),
-    ...possibleMoveGetter(state),
-    ...possibleMoveChooser(state),
     ...moveSelector(state),
     ...skillListGetter(state),
-    ...skillClassGetter(state),
-    ...skillClassSetter(state),
   };
 })();
 

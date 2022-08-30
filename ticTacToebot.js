@@ -27,6 +27,7 @@ const possibleMoveChooser = (state) => ({
     const selectionIndex = Math.floor(
       Math.random() * state.possibleMoves.length
     );
+    console.log(selectionIndex)
     const moveSelection = state.possibleMoves[selectionIndex];
     state.possibleMoves = [];
     return moveSelection;
@@ -438,8 +439,8 @@ const moveSelector = (state) => {
   const think = () => {
     const notificationText = document.querySelector("#notificationText");
     notificationText.textContent = `${currentPlayer.getName()} is thinking...`;
-    const moveSelection = currentPlayer.chooseFromPossibleMoves().getName();
-    setTimeout(gameDirector.handleMoveSelection, 1000, moveSelection);
+    const moveSelection = currentPlayer.chooseFromPossibleMoves();
+    setTimeout(gameDirector.handleMoveSelection, 1000, moveSelection.getName());
   };
   const selectAnyMove = () => {
     for (const square of squares) {
@@ -459,7 +460,9 @@ const moveSelector = (state) => {
     return think();
   };
   const selectMove = () => {
-    if (state.skill < Math.floor(Math.random() * 10)) {
+    const skillDC = Math.floor(Math.random() * 100);
+    console.log(skillDC);
+    if (state.skill < skillDC) {
       // if (true) {
       return selectAnyMove();
     }
@@ -489,10 +492,25 @@ const moveSelector = (state) => {
             currentPlayer.addPossibleMove(square);
           }
         }
+        if (currentPlayer.getPossibleMoves().length > 0) {
+          return think();
+        }
       }
     }
-    if (currentPlayer.getPossibleMoves().length > 0) {
-      return think();
+    for (const winset of winsets.getWinSupersetArray()[0].getWinsetsArray()) {
+      if (
+        winset.countMarks(state.symbol) === 1 &&
+        winset.countMarks(state.opponentSymbol) === 0
+      ) {
+        for (const square of winset.getSquaresArray()) {
+          if (square.getMark() === null) {
+            currentPlayer.addPossibleMove(square);
+          }
+        }
+        if (currentPlayer.getPossibleMoves().length > 0) {
+          return think();
+        }
+      }
     }
     if (
       gameboard.countMarks(state.symbol) === 0 &&

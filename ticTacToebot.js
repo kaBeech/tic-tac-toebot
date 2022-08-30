@@ -598,6 +598,12 @@ const colorUpdater = (state) => ({
     document.querySelector(
       "body"
     ).style.color = `hsl(${state.rainbowHue}, 100%, 80%)`;
+    const colorInvertedElements = document.querySelectorAll(
+      ".invertColor"
+    );
+    for (const element of colorInvertedElements) {
+      element.style['background-color'] = `hsl(${state.rainbowHue}, 100%, 80%)`;
+    }
   },
 });
 

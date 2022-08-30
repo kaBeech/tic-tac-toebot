@@ -39,14 +39,20 @@ h1 {
 } */
 
 .playerButton {
-    width: 8rem;
-    text-align: center;
+    width: 8.5rem;
+    height: 1.5rem;
+    justify-content: center;
     border-style: solid;
     border-radius: 10%;
+    align-items: center;
+    display: flex;
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 
 .playerButtons {
     gap: 1rem;
+    margin-bottom: 3rem;
 }
 
 .gameSquare {

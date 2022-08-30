@@ -32,11 +32,13 @@ h1 {
 
 #middleSection {
     gap: 2rem;
+    justify-content: center;
 }
 
 .playerCard {
     justify-content: space-around;
     align-items: center;
+    min-width: 20rem;
 }
 
 /* #player1Card {
@@ -52,7 +54,7 @@ h1 {
     height: 1.8rem;
     justify-content: center;
     border-style: solid;
-    border-radius: 10%;
+    border-radius: 0.7rem;
     align-items: center;
     display: flex;
     font-size: 1.2rem;

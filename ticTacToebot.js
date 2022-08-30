@@ -539,6 +539,8 @@ const gameDirector = (() => {
     activeStatus: false,
     winner: null,
     waitingStatus: false,
+    symbolSelectionArray: ["X", "O", "RND"],
+    startingPlayerSelectionArray: ["1ST", "2ND", "RND"],
   };
 
   return {

@@ -47,10 +47,10 @@ const nameSetter = (state) => ({
 });
 
 const nameChanger = () => ({
-  changeName: () => {
+  changeName: function changeName() {
     // if (!gameDirector.getActiveStatus()) {
-    player1.setName(prompt("Enter Player1's Name", "Human Challenger"));
-    player1Card.updateNameDisplay(player1.getName());
+    this.setName(prompt("Enter Player1's Name", "Human Challenger"));
+    player1Card.updateNameDisplay(this.getName());
     // }
   },
 });
@@ -153,11 +153,41 @@ const skillClassSetter = (state) => ({
   },
 });
 
-const Player = (name, symbol, species) => {
+const humanChecker = (state) => ({
+  checkHuman: () => state.humanQuestionMark,
+});
+
+const HumanInterface = () => {
+  const state = {
+    humanQuestionMark: "yes",
+  };
+  return {
+    ...checkHuman(state),
+  };
+};
+
+const AIInterface = (skillClass) => {
+  const state = {
+    possibleMoves: [],
+    skillClass,
+  };
+  return { 
+    ...skillChanger(state),
+    ...possibleMoveAdder(state),
+    ...possibleMoveGetter(state),
+    ...possibleMoveChooser(state),
+    ...skillClassGetter(state),
+    ...skillClassSetter(state),
+    ...skillClassIncrementer(state),
+  };
+};
+
+const Player = (name, symbol, species, input) => {
   const state = {
     name,
     symbol,
     species,
+    input,
     possibleMoves: [],
     skillClass: hard,
   };
@@ -176,9 +206,9 @@ const Player = (name, symbol, species) => {
     ...skillClassIncrementer(state),
   };
 };
-
-const player1 = Player("Human Challenger", "O", "human");
-const player2 = Player("Schoolyard Champ", "X", "computer");
+// Notes for later RE: Imput. p sure the syntax is wrong
+const player1 = Player("Human Challenger", "O", "human", "const humanInput1 = HumanInterface()");
+const player2 = Player("Schoolyard Champ", "X", "computer", "const computerInput1 = AIInterface()");
 
 const markGetter = (state) => ({
   getMark: () => state.mark,
@@ -394,13 +424,13 @@ const playerButtonDeactivator = () => ({
 });
 
 const newGameStarter = () => ({
-  startNewGame: () => {
-    gameDirector.setActiveStatus(true);
-    gameDirector.deactivatePlayerButtons();
-    gameDirector.clearGameboardSquares();
-    gameDirector.clearDOMSquares();
-    gameDirector.setWinner(null);
-    gameDirector.notifyCurrentPlayer();
+  startNewGame: function startNewGame() {
+    this.setActiveStatus(true);
+    this.deactivatePlayerButtons();
+    this.clearGameboardSquares();
+    this.clearDOMSquares();
+    this.setWinner(null);
+    this.notifyCurrentPlayer();
   },
 });
 

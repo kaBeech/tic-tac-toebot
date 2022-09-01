@@ -179,9 +179,7 @@ const possibleMoveAdder = (state) => ({
 
 const possibleMoveChooser = (state) => ({
   chooseFromPossibleMoves: () => {
-    const selectionIndex = Math.floor(
-      Math.random() * state.possibleMoves.length
-    );
+    const selectionIndex = toolbox.getRandomInteger(state.possibleMoves.length);
     const moveSelection = state.possibleMoves[selectionIndex];
     state.possibleMoves = [];
     return moveSelection;
@@ -709,7 +707,7 @@ const moveSelector = (state) => {
     return think();
   };
   const selectMove = () => {
-    const skillDC = Math.floor(Math.random() * 100);
+    const skillDC = getRandomInteger(100, 1);
     if (player2.getSkillClass().getSkillLevel() < skillDC) {
       return selectAnyMove();
     }
@@ -841,7 +839,7 @@ const colorUpdater = (state) => ({
 
 const colorController = (() => {
   const state = {
-    rainbowHue: Math.floor(Math.random() * 360),
+    rainbowHue: getRandomInteger(360, 1),
     body: document.querySelector("body"),
   };
   return { ...rainbowShifter(state), ...colorUpdater(state) };

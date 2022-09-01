@@ -88,25 +88,25 @@ const skillListGetter = (state) => ({
 });
 
 const skillClassIncrementer = () => ({
-  incrementSkillClass: () => {
-    const skillClass = player2.getSkillClass();
+  incrementSkillClass: function incrementSkillClass() {
+    const skillClass = this.getSkillClass();
     const skillList = ai.getSkillList();
     let newSkillClassIndex = +skillClass.getIndex() + 1;
     if (newSkillClassIndex > 3) {
       newSkillClassIndex = 0;
     }
-    player2.setSkillClass(skillList[newSkillClassIndex]);
+    this.setSkillClass(skillList[newSkillClassIndex]);
   },
 });
 
 const skillChanger = () => ({
-  changeSkill: () => {
+  changeSkill: function changeSkill() {
     // if (!gameDirector.getActiveStatus()) {
     const player2SkillButton = document.querySelector("#player2SkillButton");
-    player2.incrementSkillClass();
-    player2Card.updateNameDisplay(player2.getSkillClass().getCardName());
-    player2.setName(player2.getSkillClass().getCardName());
-    player2SkillButton.textContent = player2
+    this.incrementSkillClass();
+    player2Card.updateNameDisplay(this.getSkillClass().getCardName());
+    this.setName(this.getSkillClass().getCardName());
+    player2SkillButton.textContent = this
       .getSkillClass()
       .getName()
       .toUpperCase();
@@ -345,7 +345,7 @@ const winSupersetArrayGetter = (state) => ({
 });
 
 const winChecker = () => ({
-  checkWin: () => {
+  checkWin: function checkWin() {
     for (const winset of winsets.getWinsetsArray()) {
       winset.checkWinset(winset);
     }
@@ -497,10 +497,10 @@ const domAssigner = () => ({
 });
 
 const playerNotifier = (state) => ({
-  notifyCurrentPlayer: () => {
+  notifyCurrentPlayer: function notifyCurrentPlayer() {
     const notificationText = document.querySelector("#notificationText");
     notificationText.textContent = `${state.currentPlayer.getName()}, it is your turn!`;
-    gameDirector.setWaitingStatus(true);
+    this.setWaitingStatus(true);
     if (state.currentPlayer.getSpecies() === "computer") {
       ai.selectMove();
     }
@@ -518,7 +518,7 @@ const waitingStatusSetter = (state) => ({
 });
 
 const moveSelectionHandler = () => ({
-  handleMoveSelection: (moveSelection) => {
+  handleMoveSelection: function handleMoveSelection(moveSelection) {
     const gameboardSquareIndex = gameboard
       .getGameSquareIDs()
       .indexOf(moveSelection);
@@ -534,11 +534,11 @@ const moveSelectionHandler = () => ({
 });
 
 const moveSelectionApplicator = (state) => ({
-  applyMoveSelection: (moveSelection, gameboardSquare) => {
+  applyMoveSelection: function applyMoveSelection(moveSelection, gameboardSquare) {
     const domSquare = document.querySelector(`#${moveSelection}`);
     domSquare.textContent = state.currentPlayer.getSymbol();
     gameboardSquare.setMark(state.currentPlayer.getSymbol());
-    gameDirector.checkWin();
+    this.checkWin();
   },
 });
 
@@ -563,13 +563,13 @@ const activeStatusSetter = (state) => ({
 });
 
 const turnIncrementer = (state) => ({
-  incrementTurn: () => {
+  incrementTurn: function incrementTurn() {
     if (state.currentPlayer === player1) {
       state.currentPlayer = player2;
     } else if (state.currentPlayer === player2) {
       state.currentPlayer = player1;
     }
-    gameDirector.notifyCurrentPlayer();
+    this.notifyCurrentPlayer();
   },
 });
 

@@ -48,10 +48,9 @@ const nameSetter = (state) => ({
 
 const nameChanger = () => ({
   changeName: function changeName() {
-    // if (!gameDirector.getActiveStatus()) {
+    if (gameDirector.getActiveStatus() === true) {return};
     this.setName(prompt("Enter Player1's Name", "Human Challenger"));
     player1Card.updateNameDisplay(this.getName());
-    // }
   },
 });
 
@@ -101,7 +100,7 @@ const skillClassIncrementer = () => ({
 
 const skillChanger = () => ({
   changeSkill: function changeSkill() {
-    // if (!gameDirector.getActiveStatus()) {
+    if (gameDirector.getActiveStatus() === true) {return};
     const player2SkillButton = document.querySelector("#player2SkillButton");
     this.incrementSkillClass();
     player2Card.updateNameDisplay(this.getSkillClass().getCardName());
@@ -110,7 +109,6 @@ const skillChanger = () => ({
       .getSkillClass()
       .getName()
       .toUpperCase();
-    // }
   },
 });
 

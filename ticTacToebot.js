@@ -91,7 +91,10 @@ const skillListGetter = (state) => ({
 const skillClassIncrementer = (state) => ({
   incrementSkillClass: () => {
     const skillList = ai.getSkillList();
-    const newSkillClassIndex = toolbox.getIncrementedIndex(skillList, state.skillClass);
+    const newSkillClassIndex = toolbox.getIncrementedIndex(
+      skillList,
+      state.skillClass
+    );
     state.skillClass = skillList[newSkillClassIndex];
   },
 });
@@ -122,17 +125,14 @@ const incrementedIndexGetter = () => ({
 });
 
 const randomIntegerGetter = () => ({
-  getRandomInteger: (range, minInteger) => 
-    Math.floor(
-      Math.random() * range
-    ) + minInteger
-  
-})
+  getRandomInteger: (range, minInteger) =>
+    Math.floor(Math.random() * range) + minInteger,
+});
 
 const toolbox = (() => {
   const state = {
     name: "toolbox",
-      };
+  };
 
   return {
     ...incrementedIndexGetter(state),
@@ -143,7 +143,10 @@ const toolbox = (() => {
 const symbolIncrementer = (state) => ({
   incrementSymbol: function incrementSymbol() {
     const symbolList = gameDirector.getSymbolList();
-    const newSymbolIndex = toolbox.getIncrementedIndex(symbolList, state.symbol);
+    const newSymbolIndex = toolbox.getIncrementedIndex(
+      symbolList,
+      state.symbol
+    );
     state.symbol = symbolList[newSymbolIndex];
   },
 });

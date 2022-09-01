@@ -48,7 +48,9 @@ const nameSetter = (state) => ({
 
 const nameChanger = () => ({
   changeName: function changeName() {
-    if (gameDirector.getActiveStatus() === true) {return};
+    if (gameDirector.getActiveStatus() === true) {
+      return;
+    }
     this.setName(prompt("Enter Player1's Name", "Human Challenger"));
     player1Card.updateNameDisplay(this.getName());
   },
@@ -86,29 +88,74 @@ const skillListGetter = (state) => ({
   getSkillList: () => state.skillList,
 });
 
-const skillClassIncrementer = () => ({
-  incrementSkillClass: function incrementSkillClass() {
-    const skillClass = this.getSkillClass();
+const skillClassIncrementer = (state) => ({
+  incrementSkillClass: () => {
     const skillList = ai.getSkillList();
-    let newSkillClassIndex = +skillClass.getIndex() + 1;
-    if (newSkillClassIndex > 3) {
-      newSkillClassIndex = 0;
-    }
-    this.setSkillClass(skillList[newSkillClassIndex]);
+    const newSkillClassIndex = toolbox.getIncrementedIndex(skillList, state.skillClass);
+    state.skillClass = skillList[newSkillClassIndex];
   },
 });
 
 const skillChanger = () => ({
   changeSkill: function changeSkill() {
-    if (gameDirector.getActiveStatus() === true) {return};
+    if (gameDirector.getActiveStatus() === true) {
+      return;
+    }
     const player2SkillButton = document.querySelector("#player2SkillButton");
     this.incrementSkillClass();
     player2Card.updateNameDisplay(this.getSkillClass().getCardName());
     this.setName(this.getSkillClass().getCardName());
-    player2SkillButton.textContent = this
-      .getSkillClass()
+    player2SkillButton.textContent = this.getSkillClass()
       .getName()
       .toUpperCase();
+  },
+});
+
+const incrementedIndexGetter = () => ({
+  getIncrementedIndex: (array, value) => {
+    let newIndex = array.indexOf(value) + 1;
+    if (newIndex >= array.length) {
+      newIndex = 0;
+    }
+    return newIndex;
+  },
+});
+
+const randomIntegerGetter = () => ({
+  getRandomInteger: (range, minInteger) => 
+    Math.floor(
+      Math.random() * range
+    ) + minInteger
+  
+})
+
+const toolbox = (() => {
+  const state = {
+    name: "toolbox",
+      };
+
+  return {
+    ...incrementedIndexGetter(state),
+    ...randomIntegerGetter(state),
+  };
+})();
+
+const symbolIncrementer = (state) => ({
+  incrementSymbol: function incrementSymbol() {
+    const symbolList = gameDirector.getSymbolList();
+    const newSymbolIndex = toolbox.getIncrementedIndex(symbolList, state.symbol);
+    state.symbol = symbolList[newSymbolIndex];
+  },
+});
+
+const symbolChanger = (state) => ({
+  changeSymbol: function changeSymbol() {
+    if (gameDirector.getActiveStatus() === true) {
+      return;
+    }
+    const player1SymbolButton = document.querySelector("#player1SymbolButton");
+    this.incrementSymbol();
+    player1SymbolButton.textContent = state.symbol;
   },
 });
 
@@ -169,7 +216,7 @@ const AIInterface = (skillClass) => {
     possibleMoves: [],
     skillClass,
   };
-  return { 
+  return {
     ...skillChanger(state),
     ...possibleMoveAdder(state),
     ...possibleMoveGetter(state),
@@ -195,6 +242,8 @@ const Player = (name, symbol, species, input) => {
     ...nameChanger(state),
     ...skillChanger(state),
     ...symbolGetter(state),
+    ...symbolChanger(state),
+    ...symbolIncrementer(state),
     ...speciesGetter(state),
     ...possibleMoveAdder(state),
     ...possibleMoveGetter(state),
@@ -205,8 +254,18 @@ const Player = (name, symbol, species, input) => {
   };
 };
 // Notes for later RE: Imput. p sure the syntax is wrong
-const player1 = Player("Human Challenger", "O", "human", "const humanInput1 = HumanInterface()");
-const player2 = Player("Schoolyard Champ", "X", "computer", "const computerInput1 = AIInterface()");
+const player1 = Player(
+  "Human Challenger",
+  "O",
+  "human",
+  "const humanInput1 = HumanInterface()"
+);
+const player2 = Player(
+  "Schoolyard Champ",
+  "X",
+  "computer",
+  "const computerInput1 = AIInterface()"
+);
 
 const markGetter = (state) => ({
   getMark: () => state.mark,
@@ -470,9 +529,9 @@ const domAssigner = () => ({
     player1Buttons[1].addEventListener("click", () => {
       player1.changeName();
     });
-    // player1Buttons[2].addEventListener("click", () => {
-    //   player1.changeSymbol();
-    // });
+    player1Buttons[2].addEventListener("click", () => {
+      player1.changeSymbol();
+    });
     // player1Buttons[3].addEventListener("click", () => {
     //   player1.changeTurnOrder();
     // });
@@ -532,7 +591,10 @@ const moveSelectionHandler = () => ({
 });
 
 const moveSelectionApplicator = (state) => ({
-  applyMoveSelection: function applyMoveSelection(moveSelection, gameboardSquare) {
+  applyMoveSelection: function applyMoveSelection(
+    moveSelection,
+    gameboardSquare
+  ) {
     const domSquare = document.querySelector(`#${moveSelection}`);
     domSquare.textContent = state.currentPlayer.getSymbol();
     gameboardSquare.setMark(state.currentPlayer.getSymbol());
@@ -571,6 +633,10 @@ const turnIncrementer = (state) => ({
   },
 });
 
+const symbolListGetter = (state) => ({
+  getSymbolList: () => state.symbolList,
+});
+
 const winnerGetter = (state) => ({
   getWinner: () => state.winner,
 });
@@ -588,7 +654,7 @@ const gameDirector = (() => {
     activeStatus: false,
     winner: null,
     waitingStatus: false,
-    symbolSelectionArray: ["X", "O", "RND"],
+    symbolList: ["X", "O", "RND"],
     startingPlayerSelectionArray: ["1ST", "2ND", "RND"],
   };
 
@@ -610,6 +676,7 @@ const gameDirector = (() => {
     ...activeStatusGetter(state),
     ...activeStatusSetter(state),
     ...turnIncrementer(state),
+    ...symbolListGetter(state),
     ...winnerGetter(state),
     ...winnerSetter(state),
   };
@@ -785,14 +852,14 @@ const pageInitializer = () => ({
     setInterval(colorController.shiftRainbow, 250);
     setInterval(colorController.updateColor, 250);
     gameDirector.assignSquares();
-  }
-})
+  },
+});
 
 const pageController = (() => {
   const state = {
     name: "pageController",
   };
-  return { ...nameGetter(state), ...pageInitializer(state), };
+  return { ...nameGetter(state), ...pageInitializer(state) };
 })();
 
 pageController.initializePage();

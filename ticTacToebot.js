@@ -146,13 +146,22 @@ const symbolButtonUpdater = (state) => ({
   }
 });
 
+const turnOrderButtonUpdater = (state) => ({
+  updateTurnOrderButtons: () => {
+    state.player1TurnOrderButton.textContent = player1.getTurnOrder();
+  }
+});
+
 const displayController = (() => {
   const state = {
     player1SymbolButton: document.querySelector("#player1SymbolButton"),
+    player1TurnOrderButton: document.querySelector("#player1TurnOrderButton"),
+
   };
 
   return {
     ...symbolButtonUpdater(state),
+    ...turnOrderButtonUpdater(state),
   }
 })();
 
@@ -181,13 +190,26 @@ const symbolGetter = (state) => ({
   getSymbol: () => state.symbol,
 });
 
-// const turnOrderChanger = (state) => ({
-//   changeTurnOrder: () => {
-//     if (gameDirector.getActiveStatus() === true) {
-//       return;
-//     }
-//   }
-// });
+const turnOrderIncrementer = (state) => ({
+  incrementTurnOrder: function incrementTurnOrder() {
+    const turnOrderList = gameDirector.getTurnOrderList();
+    const newTurnOrderIndex = toolbox.getIncrementedIndex(
+      turnOrderList,
+      state.turnOrder
+    );
+    state.turnOrder = turnOrderList[newTurnOrderIndex];
+  },
+});
+
+const turnOrderChanger = (state) => ({
+  changeTurnOrder: function changeTurnOrder() {
+    if (gameDirector.getActiveStatus() === true) {
+      return;
+    }
+    this.incrementTurnOrder();
+    displayController.updateTurnOrderButtons();
+  }
+});
 
 const speciesGetter = (state) => ({
   getSpecies: () => state.species,
@@ -251,6 +273,10 @@ const AIInterface = (skillClass) => {
   };
 };
 
+const turnOrderGetter = (state) => ({
+  getTurnOrder: () => state.turnOrder,
+});
+
 const Player = (name, symbol, species, input) => {
   const state = {
     name,
@@ -259,8 +285,12 @@ const Player = (name, symbol, species, input) => {
     input,
     possibleMoves: [],
     skillClass: hard,
+    turnOrder: "1ST",
   };
   return {
+    ...turnOrderGetter(state),
+    ...turnOrderChanger(state),
+    ...turnOrderIncrementer(state),
     ...nameGetter(state),
     ...nameSetter(state),
     ...nameChanger(state),
@@ -556,9 +586,9 @@ const domAssigner = () => ({
     player1Buttons[2].addEventListener("click", () => {
       player1.changeSymbol();
     });
-    // player1Buttons[3].addEventListener("click", () => {
-    // //   player1.changeTurnOrder();
-    // });
+    player1Buttons[3].addEventListener("click", () => {
+      player1.changeTurnOrder();
+    });
     // player2Buttons[0].addEventListener("click", () => {
     //   player2.changeSpecies();
     // });
@@ -661,6 +691,10 @@ const symbolListGetter = (state) => ({
   getSymbolList: () => state.symbolList,
 });
 
+const turnOrderListGetter = (state) => ({
+  getTurnOrderList: () => state.turnOrderList,
+});
+
 const winnerGetter = (state) => ({
   getWinner: () => state.winner,
 });
@@ -679,7 +713,7 @@ const gameDirector = (() => {
     winner: null,
     waitingStatus: false,
     symbolList: ["X", "O", "RND"],
-    startingPlayerSelectionArray: ["1ST", "2ND", "RND"],
+    turnOrderList: ["1ST", "2ND", "RND"],
   };
 
   return {
@@ -700,6 +734,7 @@ const gameDirector = (() => {
     ...activeStatusGetter(state),
     ...activeStatusSetter(state),
     ...turnIncrementer(state),
+    ...turnOrderListGetter(state),
     ...symbolListGetter(state),
     ...winnerGetter(state),
     ...winnerSetter(state),

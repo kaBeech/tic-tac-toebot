@@ -143,27 +143,43 @@ const toolbox = (() => {
 const symbolButtonUpdater = (state) => ({
   updateSymbolButtons: () => {
     state.player1SymbolButton.textContent = player1.getSymbol();
-  }
+    state.player2SymbolButton.textContent = player2.getSymbol();
+  },
 });
 
 const turnOrderButtonUpdater = (state) => ({
   updateTurnOrderButtons: () => {
     state.player1TurnOrderButton.textContent = player1.getTurnOrder();
-  }
+    state.player2TurnOrderButton.textContent = player2.getTurnOrder();
+  },
 });
 
 const displayController = (() => {
   const state = {
     player1SymbolButton: document.querySelector("#player1SymbolButton"),
+    player2SymbolButton: document.querySelector("#player2SymbolButton"),
     player1TurnOrderButton: document.querySelector("#player1TurnOrderButton"),
-
+    player2TurnOrderButton: document.querySelector("#player2TurnOrderButton"),
   };
 
   return {
     ...symbolButtonUpdater(state),
     ...turnOrderButtonUpdater(state),
-  }
+  };
 })();
+
+const symbolMatcher = (state) => ({
+  matchSymbol: () => {
+    const opponentSymbol = state.opponent.getSymbol();
+    if (opponentSymbol === "X") {
+      state.symbol = "O";
+    } else if (opponentSymbol === "O") {
+      state.symbol = "X";
+    } else {
+      state.symbol = opponentSymbol;
+    }
+  },
+});
 
 const symbolIncrementer = (state) => ({
   incrementSymbol: function incrementSymbol() {
@@ -182,6 +198,7 @@ const symbolChanger = (state) => ({
       return;
     }
     this.incrementSymbol();
+    state.opponent.matchSymbol();
     displayController.updateSymbolButtons();
   },
 });
@@ -190,8 +207,21 @@ const symbolGetter = (state) => ({
   getSymbol: () => state.symbol,
 });
 
+const turnOrderMatcher = (state) => ({
+  matchTurnOrder: () => {
+    const opponentTurnOrder = state.opponent.getTurnOrder();
+    if (opponentTurnOrder === "1ST") {
+      state.turnOrder = "2ND";
+    } else if (opponentTurnOrder === "2ND") {
+      state.turnOrder = "1ST";
+    } else {
+      state.turnOrder = opponentTurnOrder;
+    }
+  },
+});
+
 const turnOrderIncrementer = (state) => ({
-  incrementTurnOrder: function incrementTurnOrder() {
+  incrementTurnOrder: () => {
     const turnOrderList = gameDirector.getTurnOrderList();
     const newTurnOrderIndex = toolbox.getIncrementedIndex(
       turnOrderList,
@@ -207,8 +237,9 @@ const turnOrderChanger = (state) => ({
       return;
     }
     this.incrementTurnOrder();
+    state.opponent.matchTurnOrder();
     displayController.updateTurnOrderButtons();
-  }
+  },
 });
 
 const speciesGetter = (state) => ({
@@ -227,7 +258,10 @@ const possibleMoveAdder = (state) => ({
 
 const possibleMoveChooser = (state) => ({
   chooseFromPossibleMoves: () => {
-    const selectionIndex = toolbox.getRandomInteger(0, state.possibleMoves.length);
+    const selectionIndex = toolbox.getRandomInteger(
+      0,
+      state.possibleMoves.length
+    );
     const moveSelection = state.possibleMoves[selectionIndex];
     state.possibleMoves = [];
     return moveSelection;
@@ -277,19 +311,27 @@ const turnOrderGetter = (state) => ({
   getTurnOrder: () => state.turnOrder,
 });
 
-const Player = (name, symbol, species, input) => {
+const opponentSetter = (state) => ({
+  setOpponent: (newOpponent) => {
+    state.opponent = newOpponent;
+  },
+});
+
+const Player = (name, symbol, turnOrder, species, input, opponent) => {
   const state = {
     name,
     symbol,
     species,
+    turnOrder,
     input,
     possibleMoves: [],
     skillClass: hard,
-    turnOrder: "1ST",
+    opponent,
   };
   return {
     ...turnOrderGetter(state),
     ...turnOrderChanger(state),
+    ...turnOrderMatcher(state),
     ...turnOrderIncrementer(state),
     ...nameGetter(state),
     ...nameSetter(state),
@@ -297,6 +339,7 @@ const Player = (name, symbol, species, input) => {
     ...skillChanger(state),
     ...symbolGetter(state),
     ...symbolChanger(state),
+    ...symbolMatcher(state),
     ...symbolIncrementer(state),
     ...speciesGetter(state),
     ...possibleMoveAdder(state),
@@ -305,21 +348,29 @@ const Player = (name, symbol, species, input) => {
     ...skillClassGetter(state),
     ...skillClassSetter(state),
     ...skillClassIncrementer(state),
+    ...opponentSetter(state),
   };
 };
 // Notes for later RE: Imput. p sure the syntax is wrong
 const player1 = Player(
   "Human Challenger",
   "O",
+  "1ST",
   "human",
-  "const humanInput1 = HumanInterface()"
+  "const humanInput1 = HumanInterface()",
+  "default"
 );
+
 const player2 = Player(
   "Schoolyard Champ",
   "X",
+  "2ND",
   "computer",
-  "const computerInput1 = AIInterface()"
+  "const computerInput1 = AIInterface()",
+  player1
 );
+
+player1.setOpponent(player2);
 
 const markGetter = (state) => ({
   getMark: () => state.mark,
@@ -595,12 +646,12 @@ const domAssigner = () => ({
     player2Buttons[1].addEventListener("click", () => {
       player2.changeSkill();
     });
-    // player2Buttons[2].addEventListener("click", () => {
-    //   player2.changeSymbol();
-    // });
-    // player2Buttons[3].addEventListener("click", () => {
-    //   player2.changeTurnOrder();
-    // });
+    player2Buttons[2].addEventListener("click", () => {
+      player2.changeSymbol();
+    });
+    player2Buttons[3].addEventListener("click", () => {
+      player2.changeTurnOrder();
+    });
     newGameButton.addEventListener("click", () => {
       gameDirector.startNewGame();
     });
@@ -768,7 +819,7 @@ const moveSelector = (state) => {
     return think();
   };
   const selectMove = () => {
-    const skillDC = getRandomInteger(1, 100);
+    const skillDC = toolbox.getRandomInteger(1, 100);
     if (player2.getSkillClass().getSkillLevel() < skillDC) {
       return selectAnyMove();
     }

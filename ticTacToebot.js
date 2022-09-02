@@ -140,6 +140,22 @@ const toolbox = (() => {
   };
 })();
 
+const symbolButtonUpdater = (state) => ({
+  updateSymbolButtons: () => {
+    state.player1SymbolButton.textContent = player1.getSymbol();
+  }
+});
+
+const displayController = (() => {
+  const state = {
+    player1SymbolButton: document.querySelector("#player1SymbolButton"),
+  };
+
+  return {
+    ...symbolButtonUpdater(state),
+  }
+})();
+
 const symbolIncrementer = (state) => ({
   incrementSymbol: function incrementSymbol() {
     const symbolList = gameDirector.getSymbolList();
@@ -156,15 +172,22 @@ const symbolChanger = (state) => ({
     if (gameDirector.getActiveStatus() === true) {
       return;
     }
-    const player1SymbolButton = document.querySelector("#player1SymbolButton");
     this.incrementSymbol();
-    player1SymbolButton.textContent = state.symbol;
+    displayController.updateSymbolButtons();
   },
 });
 
 const symbolGetter = (state) => ({
   getSymbol: () => state.symbol,
 });
+
+// const turnOrderChanger = (state) => ({
+//   changeTurnOrder: () => {
+//     if (gameDirector.getActiveStatus() === true) {
+//       return;
+//     }
+//   }
+// });
 
 const speciesGetter = (state) => ({
   getSpecies: () => state.species,
@@ -534,7 +557,7 @@ const domAssigner = () => ({
       player1.changeSymbol();
     });
     // player1Buttons[3].addEventListener("click", () => {
-    //   player1.changeTurnOrder();
+    // //   player1.changeTurnOrder();
     // });
     // player2Buttons[0].addEventListener("click", () => {
     //   player2.changeSpecies();
@@ -842,7 +865,7 @@ const colorUpdater = (state) => ({
 
 const colorController = (() => {
   const state = {
-    rainbowHue: getRandomInteger(1, 360),
+    rainbowHue: toolbox.getRandomInteger(1, 360),
     body: document.querySelector("body"),
   };
   return { ...rainbowShifter(state), ...colorUpdater(state) };

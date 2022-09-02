@@ -129,6 +129,12 @@ const randomIntegerGetter = () => ({
     Math.floor(Math.random() * range) + minInteger,
 });
 
+const randomPicker = (state) => ({
+  pickRandom: function pickRandom(...possibleResults) {
+    return possibleResults[this.getRandomInteger(0, possibleResults.length)];
+  },
+});
+
 const toolbox = (() => {
   const state = {
     name: "toolbox",
@@ -137,6 +143,7 @@ const toolbox = (() => {
   return {
     ...incrementedIndexGetter(state),
     ...randomIntegerGetter(state),
+    ...randomPicker(state),
   };
 })();
 
@@ -588,11 +595,24 @@ const playerButtonDeactivator = () => ({
 const newGameStarter = () => ({
   startNewGame: function startNewGame() {
     this.setActiveStatus(true);
+    this.setCurrentPlayer();
     this.deactivatePlayerButtons();
     this.clearGameboardSquares();
     this.clearDOMSquares();
     this.setWinner(null);
     this.notifyCurrentPlayer();
+  },
+});
+
+const currentPlayerSetter = (state) => ({
+  setCurrentPlayer: () => {
+    if (player1.getTurnOrder === "1ST") {
+      state.currentPlayer = player1;
+    } else if (player2.getTurnOrder === "1ST") {
+      state.currentPlayer = player2;
+    } else {
+      state.currentPlayer = toolbox.pickRandom(player1, player2);
+    }
   },
 });
 
@@ -711,11 +731,11 @@ const currentPlayerGetter = (state) => ({
   getCurrentPlayer: () => state.currentPlayer,
 });
 
-const currentPlayerSetter = (state) => ({
-  setCurrentPlayer: (currentPlayer) => {
-    state.currentPlayer = currentPlayer;
-  },
-});
+// const currentPlayerSetter = (state) => ({
+//   setCurrentPlayer: (currentPlayer) => {
+//     state.currentPlayer = currentPlayer;
+//   },
+// });
 
 const activeStatusGetter = (state) => ({
   getActiveStatus: () => state.activeStatus,

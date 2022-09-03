@@ -1,5 +1,3 @@
-// Fix Turn Selector - currently backwards of Buttons (p sure this is deeper issue upstream)
-
 /* eslint-disable no-restricted-syntax */
 
 const nameDisplayGetter = (state) => ({
@@ -364,7 +362,7 @@ const Player = (name, symbol, turnOrder, species, input, opponent) => {
 const player1 = Player(
   "Human Challenger",
   "O",
-  "1ST",
+  "2ND",
   "human",
   "const humanInput1 = HumanInterface()",
   "default"
@@ -373,7 +371,7 @@ const player1 = Player(
 const player2 = Player(
   "Schoolyard Champ",
   "X",
-  "2ND",
+  "1ST",
   "computer",
   "const computerInput1 = AIInterface()",
   player1

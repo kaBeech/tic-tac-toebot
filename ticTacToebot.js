@@ -188,6 +188,12 @@ const symbolMatcher = (state) => ({
   },
 });
 
+const symbolSetter = (state) => ({
+  setSymbol: (newSymbol) => {
+    state.symbol = newSymbol;
+  },
+});
+
 const symbolIncrementer = (state) => ({
   incrementSymbol: function incrementSymbol() {
     const symbolList = gameDirector.getSymbolList();
@@ -345,6 +351,7 @@ const Player = (name, symbol, turnOrder, species, input, opponent) => {
     ...nameChanger(state),
     ...skillChanger(state),
     ...symbolGetter(state),
+    ...symbolSetter(state),
     ...symbolChanger(state),
     ...symbolMatcher(state),
     ...symbolIncrementer(state),
@@ -596,6 +603,7 @@ const newGameStarter = () => ({
   startNewGame: function startNewGame() {
     this.setActiveStatus(true);
     this.setCurrentPlayer();
+    this.assignSymbols();
     this.deactivatePlayerButtons();
     this.clearGameboardSquares();
     this.clearDOMSquares();
@@ -606,13 +614,26 @@ const newGameStarter = () => ({
 
 const currentPlayerSetter = (state) => ({
   setCurrentPlayer: () => {
-    if (player1.getTurnOrder === "1ST") {
+    if (player1.getTurnOrder() === "1ST") {
       state.currentPlayer = player1;
-    } else if (player2.getTurnOrder === "1ST") {
+    } else if (player2.getTurnOrder() === "1ST") {
       state.currentPlayer = player2;
     } else {
       state.currentPlayer = toolbox.pickRandom(player1, player2);
     }
+  },
+});
+
+const symbolAssigner = (state) => ({
+  assignSymbols: () => {
+    if (player1.getSymbol() === "X") {
+      player1.setSymbol("X");
+    } else if (player1.getSymbol() === "O") {
+      player1.setSymbol("O");
+    } else {
+      player1.setSymbol(toolbox.pickRandom("X", "O"));
+    };
+    player2.matchSymbol();
   },
 });
 
@@ -789,6 +810,7 @@ const gameDirector = (() => {
 
   return {
     ...newGameStarter(state),
+    ...symbolAssigner(state),
     ...playerButtonDeactivator(state),
     ...waitingStatusGetter(state),
     ...waitingStatusSetter(state),

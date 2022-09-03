@@ -601,10 +601,22 @@ const playerButtonDeactivator = () => ({
     const playerButtons = document.querySelectorAll(".playerButton");
     for (const playerButton of playerButtons) {
       playerButton.classList.remove("invertColor");
+      playerButton.classList.remove("clickable");
       playerButton.style["background-color"] = "#000408";
     }
   },
 });
+
+const gameClearer = (state) => ({
+  clearGame: function clearGame() {
+    this.clearGameboardSquares();
+    this.clearDOMSquares();
+    this.setWinner(null);
+    this.setActiveStatus(false);
+    this.activatePlayerButtons();
+
+  }
+})
 
 const newGameStarter = () => ({
   startNewGame: function startNewGame() {
@@ -833,6 +845,7 @@ const gameDirector = (() => {
 
   return {
     ...newGameStarter(state),
+    ...gameClearer(state),
     ...symbolAssigner(state),
     ...turnOrderAssigner(state),
     ...playerButtonDeactivator(state),
@@ -978,7 +991,7 @@ const ai = (() => {
 
 const humanMoveSelector = () => ({
   selectHumanMove: (moveSelection) => {
-    if (gameDirector.getCurrentPlayer().getSpecies() === "human") {
+    if (gameDirector.getCurrentPlayer().getSpecies() === "human" && gameDirector.getActiveStatus() === true) {
       gameDirector.handleMoveSelection(moveSelection);
     }
   },

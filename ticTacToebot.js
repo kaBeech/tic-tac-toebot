@@ -161,17 +161,41 @@ const turnOrderButtonUpdater = (state) => ({
   },
 });
 
+const newGameButtonToggler = (state) => ({
+  toggleNewGameButton: () => {
+    if (gameDirector.getActiveStatus() === true) {
+      state.newGameButton.textContent = "Clear Game";
+      state.newGameButton.removeEventListener("click", () => {
+        gameDirector.startNewGame()
+      });
+      state.newGameButton.addEventListener("click", () => {
+        gameDirector.clearGame()
+      });
+    } else {
+      state.newGameButton.textContent = "New Game";
+      state.newGameButton.removeEventListener("click", () => {
+        gameDirector.clearGame()
+      });
+      state.newGameButton.addEventListener("click", () => {
+        gameDirector.startNewGame()
+      });
+    }
+  },
+});
+
 const displayController = (() => {
   const state = {
     player1SymbolButton: document.querySelector("#player1SymbolButton"),
     player2SymbolButton: document.querySelector("#player2SymbolButton"),
     player1TurnOrderButton: document.querySelector("#player1TurnOrderButton"),
     player2TurnOrderButton: document.querySelector("#player2TurnOrderButton"),
+    newGameButton: document.querySelector('#newGameButton'),
   };
 
   return {
     ...symbolButtonUpdater(state),
     ...turnOrderButtonUpdater(state),
+    ...newGameButtonToggler(state),
   };
 })();
 
@@ -613,6 +637,7 @@ const gameClearer = (state) => ({
     this.clearDOMSquares();
     this.setWinner(null);
     this.setActiveStatus(false);
+    displayController.toggleNewGameButton();
     this.activatePlayerButtons();
 
   }
@@ -621,6 +646,7 @@ const gameClearer = (state) => ({
 const newGameStarter = () => ({
   startNewGame: function startNewGame() {
     this.setActiveStatus(true);
+    displayController.toggleNewGameButton();
     this.setCurrentPlayer();
     this.assignSymbols();
     this.assignTurnOrder();

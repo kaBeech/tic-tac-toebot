@@ -220,6 +220,12 @@ const symbolGetter = (state) => ({
   getSymbol: () => state.symbol,
 });
 
+const turnOrderSetter = (state) => ({
+  setTurnOrder: (newTurnOrder) => {
+    state.turnOrder = newTurnOrder;
+  },
+});
+
 const turnOrderMatcher = (state) => ({
   matchTurnOrder: () => {
     const opponentTurnOrder = state.opponent.getTurnOrder();
@@ -343,6 +349,7 @@ const Player = (name, symbol, turnOrder, species, input, opponent) => {
   };
   return {
     ...turnOrderGetter(state),
+    ...turnOrderSetter(state),
     ...turnOrderChanger(state),
     ...turnOrderMatcher(state),
     ...turnOrderIncrementer(state),
@@ -604,6 +611,9 @@ const newGameStarter = () => ({
     this.setActiveStatus(true);
     this.setCurrentPlayer();
     this.assignSymbols();
+    this.assignTurnOrder();
+    displayController.updateSymbolButtons();
+    displayController.updateTurnOrderButtons();
     this.deactivatePlayerButtons();
     this.clearGameboardSquares();
     this.clearDOMSquares();
@@ -621,6 +631,19 @@ const currentPlayerSetter = (state) => ({
     } else {
       state.currentPlayer = toolbox.pickRandom(player1, player2);
     }
+  },
+});
+
+const turnOrderAssigner = (state) => ({
+  assignTurnOrder: () => {
+    if (player1.getTurnOrder() === "1ST") {
+      player1.setTurnOrder("1ST");
+    } else if (player2.getTurnOrder() === "1ST") {
+      player2.setTurnOrder("1ST");
+    } else {
+      player1.setTurnOrder(toolbox.pickRandom("1ST", "2ND"));
+    };
+    player2.matchTurnOrder();
   },
 });
 
@@ -811,6 +834,7 @@ const gameDirector = (() => {
   return {
     ...newGameStarter(state),
     ...symbolAssigner(state),
+    ...turnOrderAssigner(state),
     ...playerButtonDeactivator(state),
     ...waitingStatusGetter(state),
     ...waitingStatusSetter(state),

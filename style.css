@@ -13,6 +13,10 @@ body {
     background-color: #000408;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 #title {
     margin: 0;
 }

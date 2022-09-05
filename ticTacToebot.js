@@ -161,27 +161,27 @@ const turnOrderButtonUpdater = (state) => ({
   },
 });
 
-const newGameButtonToggler = (state) => ({
-  toggleNewGameButton: () => {
-    if (gameDirector.getActiveStatus() === true) {
-      state.newGameButton.textContent = "Clear Game";
-      state.newGameButton.removeEventListener("click", () => {
-        gameDirector.startNewGame()
-      });
-      state.newGameButton.addEventListener("click", () => {
-        gameDirector.clearGame()
-      });
-    } else {
-      state.newGameButton.textContent = "New Game";
-      state.newGameButton.removeEventListener("click", () => {
-        gameDirector.clearGame()
-      });
-      state.newGameButton.addEventListener("click", () => {
-        gameDirector.startNewGame()
-      });
-    }
-  },
-});
+// const startGameButtonToggler = (state) => ({
+//   togglestartGameButton: () => {
+//     if (gameDirector.getActiveStatus() === true) {
+//       state.startGameButton.textContent = "Clear Game";
+//       state.startGameButton.removeEventListener("click", () => {
+//         gameDirector.startNewGame()
+//       });
+//       state.startGameButton.addEventListener("click", () => {
+//         gameDirector.clearGame()
+//       });
+//     } else {
+//       state.startGameButton.textContent = "New Game";
+//       state.startGameButton.removeEventListener("click", () => {
+//         gameDirector.clearGame()
+//       });
+//       state.startGameButton.addEventListener("click", () => {
+//         gameDirector.startNewGame()
+//       });
+//     }
+//   },
+// });
 
 const displayController = (() => {
   const state = {
@@ -189,13 +189,13 @@ const displayController = (() => {
     player2SymbolButton: document.querySelector("#player2SymbolButton"),
     player1TurnOrderButton: document.querySelector("#player1TurnOrderButton"),
     player2TurnOrderButton: document.querySelector("#player2TurnOrderButton"),
-    newGameButton: document.querySelector('#newGameButton'),
+    startGameButton: document.querySelector('#startGameButton'),
   };
 
   return {
     ...symbolButtonUpdater(state),
     ...turnOrderButtonUpdater(state),
-    ...newGameButtonToggler(state),
+    // ...startGameButtonToggler(state),
   };
 })();
 
@@ -562,7 +562,6 @@ const winChecker = () => ({
     ) {
       notificationText.textContent = "CAT'S GAME!";
       gameDirector.setWinner("Draw");
-      gameDirector.setActiveStatus(false);
     }
     if (gameDirector.getWinner() === null) {
       gameDirector.incrementTurn();
@@ -631,28 +630,85 @@ const playerButtonDeactivator = () => ({
   },
 });
 
+const playerButtonActivator = () => ({
+  activatePlayerButtons: () => {
+    const playerButtons = document.querySelectorAll(".playerButton");
+    for (const playerButton of playerButtons) {
+      playerButton.classList.add("invertColor");
+      playerButton.classList.add("clickable");
+    }
+  },
+});
+
+const startGameButtonActivator = () => ({
+  activateStartGameButton: () => {
+    const startGameButton = document.querySelector("#startGameButton");
+    startGameButton.classList.add("invertColor");
+    startGameButton.classList.add("clickable");
+  },
+});
+
+const startGameButtonDeactivator = () => ({
+  deactivateStartGameButton: () => {
+    const startGameButton = document.querySelector("#startGameButton");
+    startGameButton.classList.remove("invertColor");
+    startGameButton.classList.remove("clickable");
+    startGameButton.style["background-color"] = "#000408";
+
+  },
+});
+
+const clearGameButtonActivator = () => ({
+  activateClearGameButton: () => {
+    const clearGameButton = document.querySelector("#clearGameButton");
+    clearGameButton.classList.add("invertColor");
+    clearGameButton.classList.add("clickable");
+  },
+});
+
+const clearGameButtonDeactivator = () => ({
+  deactivateClearGameButton: () => {
+    const clearGameButton = document.querySelector("#clearGameButton");
+    clearGameButton.classList.remove("invertColor");
+    clearGameButton.classList.remove("clickable");
+    clearGameButton.style["background-color"] = "#000408";
+  },
+});
+
 const gameClearer = (state) => ({
   clearGame: function clearGame() {
+    if (gameDirector.getActiveStatus() === false) {
+      return;
+    };
     this.clearGameboardSquares();
     this.clearDOMSquares();
     this.setWinner(null);
     this.setActiveStatus(false);
-    displayController.toggleNewGameButton();
+    // displayController.togglestartGameButton();
+    const notificationText = document.querySelector("#notificationText");
+    notificationText.textContent = "";
     this.activatePlayerButtons();
-
+    this.activateStartGameButton();
+    this.deactivateClearGameButton();
   }
 })
 
 const newGameStarter = () => ({
   startNewGame: function startNewGame() {
+    if (gameDirector.getActiveStatus() === true) {
+      return;
+    };
+    this.clearDOMSquares();
     this.setActiveStatus(true);
-    displayController.toggleNewGameButton();
+    // displayController.togglestartGameButton();
     this.setCurrentPlayer();
     this.assignSymbols();
     this.assignTurnOrder();
     displayController.updateSymbolButtons();
     displayController.updateTurnOrderButtons();
     this.deactivatePlayerButtons();
+    this.deactivateStartGameButton();
+    this.activateClearGameButton();
     this.clearGameboardSquares();
     this.clearDOMSquares();
     this.setWinner(null);
@@ -723,7 +779,8 @@ const domAssigner = () => ({
     const domSquares = document.querySelectorAll(".gameSquare");
     const player1Buttons = document.querySelectorAll(".player1Button");
     const player2Buttons = document.querySelectorAll(".player2Button");
-    const newGameButton = document.querySelector("#newGameButton");
+    const startGameButton = document.querySelector("#startGameButton");
+    const clearGameButton = document.querySelector("#clearGameButton");
 
     for (const domSquare of domSquares) {
       domSquare.addEventListener("click", () => {
@@ -754,8 +811,11 @@ const domAssigner = () => ({
     player2Buttons[3].addEventListener("click", () => {
       player2.changeTurnOrder();
     });
-    newGameButton.addEventListener("click", () => {
+    startGameButton.addEventListener("click", () => {
       gameDirector.startNewGame();
+    });
+    clearGameButton.addEventListener("click", () => {
+      gameDirector.clearGame();
     });
   },
 });
@@ -874,7 +934,12 @@ const gameDirector = (() => {
     ...gameClearer(state),
     ...symbolAssigner(state),
     ...turnOrderAssigner(state),
+    ...playerButtonActivator(state),
     ...playerButtonDeactivator(state),
+    ...startGameButtonActivator(state),
+    ...startGameButtonDeactivator(state),
+    ...clearGameButtonActivator(state),
+    ...clearGameButtonDeactivator(state),
     ...waitingStatusGetter(state),
     ...waitingStatusSetter(state),
     ...nameGetter(state),

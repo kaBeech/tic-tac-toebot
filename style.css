@@ -87,7 +87,7 @@ h1 {
     margin-bottom: 1.75rem;
 }
 
-#newGameButton {
+#gameControlButtonContainer * {
     width: 10rem;
     height: 2rem;
     font-size: 1.6rem;

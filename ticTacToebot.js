@@ -161,28 +161,6 @@ const turnOrderButtonUpdater = (state) => ({
   },
 });
 
-// const startGameButtonToggler = (state) => ({
-//   togglestartGameButton: () => {
-//     if (gameDirector.getActiveStatus() === true) {
-//       state.startGameButton.textContent = "Clear Game";
-//       state.startGameButton.removeEventListener("click", () => {
-//         gameDirector.startNewGame()
-//       });
-//       state.startGameButton.addEventListener("click", () => {
-//         gameDirector.clearGame()
-//       });
-//     } else {
-//       state.startGameButton.textContent = "New Game";
-//       state.startGameButton.removeEventListener("click", () => {
-//         gameDirector.clearGame()
-//       });
-//       state.startGameButton.addEventListener("click", () => {
-//         gameDirector.startNewGame()
-//       });
-//     }
-//   },
-// });
-
 const displayController = (() => {
   const state = {
     player1SymbolButton: document.querySelector("#player1SymbolButton"),
@@ -195,7 +173,6 @@ const displayController = (() => {
   return {
     ...symbolButtonUpdater(state),
     ...turnOrderButtonUpdater(state),
-    // ...startGameButtonToggler(state),
   };
 })();
 
@@ -685,7 +662,6 @@ const gameClearer = (state) => ({
     this.setWinner(null);
     this.setActiveStatus(false);
     this.toggleDOMSquareClickability();
-    // displayController.togglestartGameButton();
     const notificationText = document.querySelector("#notificationText");
     notificationText.textContent = "";
     this.activatePlayerButtons();
@@ -701,7 +677,6 @@ const newGameStarter = () => ({
     }
     this.clearDOMSquares();
     this.setActiveStatus(true);
-    // displayController.togglestartGameButton();
     this.toggleDOMSquareClickability();
     this.setCurrentPlayer();
     this.assignSymbols();
@@ -888,12 +863,6 @@ const moveSelectionApplicator = (state) => ({
 const currentPlayerGetter = (state) => ({
   getCurrentPlayer: () => state.currentPlayer,
 });
-
-// const currentPlayerSetter = (state) => ({
-//   setCurrentPlayer: (currentPlayer) => {
-//     state.currentPlayer = currentPlayer;
-//   },
-// });
 
 const activeStatusGetter = (state) => ({
   getActiveStatus: () => state.activeStatus,

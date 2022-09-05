@@ -531,7 +531,6 @@ const winsetChecker = () => ({
         .getName()
         .toUpperCase()} WINS`;
       gameDirector.setWinner();
-      gameDirector.setActiveStatus(false);
     }
   },
 });
@@ -637,6 +636,8 @@ const playerButtonActivator = () => ({
       playerButton.classList.add("invertColor");
       playerButton.classList.add("clickable");
     }
+    playerButtons[0].classList.remove("clickable");
+    playerButtons[4].classList.remove("clickable");
   },
 });
 
@@ -684,6 +685,7 @@ const gameClearer = (state) => ({
     this.clearDOMSquares();
     this.setWinner(null);
     this.setActiveStatus(false);
+    this.toggleDOMSquareClickability();
     // displayController.togglestartGameButton();
     const notificationText = document.querySelector("#notificationText");
     notificationText.textContent = "";
@@ -701,6 +703,7 @@ const newGameStarter = () => ({
     this.clearDOMSquares();
     this.setActiveStatus(true);
     // displayController.togglestartGameButton();
+    this.toggleDOMSquareClickability();
     this.setCurrentPlayer();
     this.assignSymbols();
     this.assignTurnOrder();
@@ -770,6 +773,20 @@ const domSquareClearer = () => ({
 
     for (const domSquare of domSquares) {
       domSquare.textContent = "";
+    }
+  },
+});
+
+const domSquareClickabilityToggler = () => ({
+  toggleDOMSquareClickability: () => {
+    const domSquares = document.querySelectorAll(".gameSquare");
+
+    for (const domSquare of domSquares) {
+      if (gameDirector.getActiveStatus() === true) {
+        domSquare.classList.add('clickable')
+      } else {
+        domSquare.classList.remove('clickable');        
+      }
     }
   },
 });
@@ -947,6 +964,7 @@ const gameDirector = (() => {
     ...currentPlayerGetter(state),
     ...gameboardSquareClearer(state),
     ...domSquareClearer(state),
+    ...domSquareClickabilityToggler(state),
     ...domAssigner(state),
     ...playerNotifier(state),
     ...moveSelectionHandler(state),

@@ -189,7 +189,7 @@ const displayController = (() => {
     player2SymbolButton: document.querySelector("#player2SymbolButton"),
     player1TurnOrderButton: document.querySelector("#player1TurnOrderButton"),
     player2TurnOrderButton: document.querySelector("#player2TurnOrderButton"),
-    startGameButton: document.querySelector('#startGameButton'),
+    startGameButton: document.querySelector("#startGameButton"),
   };
 
   return {
@@ -655,7 +655,6 @@ const startGameButtonDeactivator = () => ({
     startGameButton.classList.remove("invertColor");
     startGameButton.classList.remove("clickable");
     startGameButton.style["background-color"] = "#000408";
-
   },
 });
 
@@ -680,7 +679,7 @@ const gameClearer = (state) => ({
   clearGame: function clearGame() {
     if (gameDirector.getActiveStatus() === false) {
       return;
-    };
+    }
     this.clearGameboardSquares();
     this.clearDOMSquares();
     this.setWinner(null);
@@ -692,14 +691,14 @@ const gameClearer = (state) => ({
     this.activatePlayerButtons();
     this.activateStartGameButton();
     this.deactivateClearGameButton();
-  }
-})
+  },
+});
 
 const newGameStarter = () => ({
   startNewGame: function startNewGame() {
     if (gameDirector.getActiveStatus() === true) {
       return;
-    };
+    }
     this.clearDOMSquares();
     this.setActiveStatus(true);
     // displayController.togglestartGameButton();
@@ -739,7 +738,7 @@ const turnOrderAssigner = (state) => ({
       player2.setTurnOrder("1ST");
     } else {
       player1.setTurnOrder(toolbox.pickRandom("1ST", "2ND"));
-    };
+    }
     player2.matchTurnOrder();
   },
 });
@@ -752,7 +751,7 @@ const symbolAssigner = (state) => ({
       player1.setSymbol("O");
     } else {
       player1.setSymbol(toolbox.pickRandom("X", "O"));
-    };
+    }
     player2.matchSymbol();
   },
 });
@@ -783,9 +782,9 @@ const domSquareClickabilityToggler = () => ({
 
     for (const domSquare of domSquares) {
       if (gameDirector.getActiveStatus() === true) {
-        domSquare.classList.add('clickable')
+        domSquare.classList.add("clickable");
       } else {
-        domSquare.classList.remove('clickable');        
+        domSquare.classList.remove("clickable");
       }
     }
   },
@@ -1100,7 +1099,10 @@ const ai = (() => {
 
 const humanMoveSelector = () => ({
   selectHumanMove: (moveSelection) => {
-    if (gameDirector.getCurrentPlayer().getSpecies() === "human" && gameDirector.getActiveStatus() === true) {
+    if (
+      gameDirector.getCurrentPlayer().getSpecies() === "human" &&
+      gameDirector.getActiveStatus() === true
+    ) {
       gameDirector.handleMoveSelection(moveSelection);
     }
   },

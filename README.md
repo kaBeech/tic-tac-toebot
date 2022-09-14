@@ -1,6 +1,6 @@
 # tic-tac-toebot
 
-Play Tic Tac Toe against a computer! THis was made to practice the factory constructor and module pattern in JavaScript
+Play Tic Tac Toe against a computer! This was made to practice the factory constructor and module pattern in JavaScript
 
 To Do:
 

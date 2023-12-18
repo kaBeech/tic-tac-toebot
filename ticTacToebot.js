@@ -507,6 +507,7 @@ const winsetChecker = () => ({
         .getCurrentPlayer()
         .getName()
         .toUpperCase()} WINS`;
+      notificationText.style.visibility = "visible";
       gameDirector.setWinner();
     }
   },
@@ -537,6 +538,7 @@ const winChecker = () => ({
       gameboard.countMarks("all") === 9
     ) {
       notificationText.textContent = "CAT'S GAME!";
+      notificationText.style.visibility = "visible";
       gameDirector.setWinner("Draw");
     }
     if (gameDirector.getWinner() === null) {
@@ -663,7 +665,8 @@ const gameClearer = (state) => ({
     this.setActiveStatus(false);
     this.toggleDOMSquareClickability();
     const notificationText = document.querySelector("#notificationText");
-    notificationText.textContent = "";
+    notificationText.textContent = "No current notification";
+    notificationText.style.visibility = "hidden";
     this.activatePlayerButtons();
     this.activateStartGameButton();
     this.deactivateClearGameButton();
@@ -815,6 +818,7 @@ const playerNotifier = (state) => ({
   notifyCurrentPlayer: function notifyCurrentPlayer() {
     const notificationText = document.querySelector("#notificationText");
     notificationText.textContent = `${state.currentPlayer.getName()}, it is your turn!`;
+    notificationText.style.visibility = "visible";
     this.setWaitingStatus(true);
     if (state.currentPlayer.getSpecies() === "computer") {
       ai.selectMove();
@@ -954,6 +958,7 @@ const moveSelector = (state) => {
   const think = () => {
     const notificationText = document.querySelector("#notificationText");
     notificationText.textContent = `${currentPlayer.getName()} is thinking...`;
+    notificationText.style.visibility = "visible";
     const moveSelection = currentPlayer.chooseFromPossibleMoves();
     setTimeout(gameDirector.handleMoveSelection, 1000, moveSelection.getName());
   };

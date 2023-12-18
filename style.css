@@ -5,6 +5,10 @@ body {
     color: #def;
 }
 
+main {
+    align-items: center;
+}
+
 .invertColor {
     background-color: #def;
     color: #000408;   
